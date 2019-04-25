@@ -18,6 +18,8 @@ namespace AssetMonitor
         private string databaseLocation;
         private SQLiteConnection conn;
         private SQLiteCommand cmd;
+
+
         public Form1()
         {
             InitializeComponent();
@@ -32,7 +34,15 @@ namespace AssetMonitor
 
         private void CommandListComboBox_SelectionChangeCommitted(object sender, EventArgs e)
         {
-
+            if (commandListComboBox.SelectedIndex == 1)
+            {
+                assetNumberTextBox.Enabled = true;
+            }
+            else
+            {
+                assetNumberTextBox.Enabled = false;
+            }
+            validateCheckAssetsButtonEnabled();
         }
 
         private void DatabaseFileSelectButton_Click(object sender, EventArgs e)
@@ -54,6 +64,57 @@ namespace AssetMonitor
                 }
 
             }
+            validateCheckAssetsButtonEnabled();
+        }
+
+        private void CheckAssetsButton_Click(object sender, EventArgs e)
+        {
+            BindingList<Loginstat> loginstats = new BindingList<Loginstat>();
+            conn.Open();
+            switch (commandListComboBox.SelectedIndex)
+            {
+                case 0:
+                    cmd.CommandText = @"select * from loginstats group by werkplekid";
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+            if (cmd.CommandText != null)
+            {
+                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        loginstats.Add(new Loginstat((string)reader["datum"], (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
+                    }
+                }
+                loginstatDataGrid.DataSource = loginstats;
+                loginstatDataGrid.Refresh();
+            }
+            conn.Close();
+        }
+
+        public void validateCheckAssetsButtonEnabled()
+        {
+            if(dbLocationTextBox.Text != string.Empty && commandListComboBox.SelectedIndex != -1)
+            {
+                checkAssetsButton.Enabled = true;
+            } else
+            {
+                checkAssetsButton.Enabled = false;
+            }
+        }
+
+        private void LoginIdTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void WorkspaceIdTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
