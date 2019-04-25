@@ -8,14 +8,14 @@ namespace AssetMonitor
 {
     public class Loginstat
     {
-        public string LoginDate {get;set; }
+        public DateTime LoginDate {get;set; }
         public string LoginTime {get;set;}
         public string Server {get;set;}
         public string LoginId {get;set;}
         public string AssetId {get;set;}
 
 
-        public Loginstat(string loginDate, string loginTime, string server, string loginId, string assetId)
+        public Loginstat(DateTime loginDate, string loginTime, string server, string loginId, string assetId)
         {
             LoginDate = loginDate;
             LoginTime = loginTime;

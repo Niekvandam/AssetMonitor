@@ -42,7 +42,19 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.assetIdTextBox = new System.Windows.Forms.TextBox();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.beforeRadioButton = new System.Windows.Forms.RadioButton();
+            this.afterRadioButton = new System.Windows.Forms.RadioButton();
+            this.label7 = new System.Windows.Forms.Label();
+            this.settingsGroupBox = new System.Windows.Forms.GroupBox();
+            this.dateFilteringGroupBox = new System.Windows.Forms.GroupBox();
+            this.dataSettingsGroupBox = new System.Windows.Forms.GroupBox();
+            this.dataGridGroupBox = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.loginstatDataGrid)).BeginInit();
+            this.settingsGroupBox.SuspendLayout();
+            this.dateFilteringGroupBox.SuspendLayout();
+            this.dataSettingsGroupBox.SuspendLayout();
+            this.dataGridGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // loginstatDataGrid
@@ -54,10 +66,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.loginstatDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.loginstatDataGrid.Location = new System.Drawing.Point(29, 168);
+            this.loginstatDataGrid.Location = new System.Drawing.Point(21, 45);
             this.loginstatDataGrid.Name = "loginstatDataGrid";
             this.loginstatDataGrid.ReadOnly = true;
-            this.loginstatDataGrid.Size = new System.Drawing.Size(545, 305);
+            this.loginstatDataGrid.Size = new System.Drawing.Size(541, 272);
             this.loginstatDataGrid.TabIndex = 0;
             // 
             // commandListComboBox
@@ -66,17 +78,18 @@
             this.commandListComboBox.Items.AddRange(new object[] {
             "List all assets",
             "List all users of asset",
-            "List missing assets"});
-            this.commandListComboBox.Location = new System.Drawing.Point(30, 37);
+            "List missing assets",
+            "List all assets with date check"});
+            this.commandListComboBox.Location = new System.Drawing.Point(6, 30);
             this.commandListComboBox.Name = "commandListComboBox";
-            this.commandListComboBox.Size = new System.Drawing.Size(121, 21);
+            this.commandListComboBox.Size = new System.Drawing.Size(216, 21);
             this.commandListComboBox.TabIndex = 1;
             this.commandListComboBox.SelectionChangeCommitted += new System.EventHandler(this.CommandListComboBox_SelectionChangeCommitted);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(27, 21);
+            this.label1.Location = new System.Drawing.Point(6, 16);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(124, 13);
             this.label1.TabIndex = 2;
@@ -85,7 +98,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(471, 21);
+            this.label2.Location = new System.Drawing.Point(282, 15);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(71, 13);
             this.label2.TabIndex = 3;
@@ -94,17 +107,17 @@
             // assetNumberTextBox
             // 
             this.assetNumberTextBox.Enabled = false;
-            this.assetNumberTextBox.Location = new System.Drawing.Point(474, 38);
+            this.assetNumberTextBox.Location = new System.Drawing.Point(282, 31);
             this.assetNumberTextBox.Name = "assetNumberTextBox";
-            this.assetNumberTextBox.Size = new System.Drawing.Size(100, 20);
+            this.assetNumberTextBox.Size = new System.Drawing.Size(71, 20);
             this.assetNumberTextBox.TabIndex = 4;
             // 
             // checkAssetsButton
             // 
             this.checkAssetsButton.Enabled = false;
-            this.checkAssetsButton.Location = new System.Drawing.Point(474, 94);
+            this.checkAssetsButton.Location = new System.Drawing.Point(395, 106);
             this.checkAssetsButton.Name = "checkAssetsButton";
-            this.checkAssetsButton.Size = new System.Drawing.Size(100, 23);
+            this.checkAssetsButton.Size = new System.Drawing.Size(167, 42);
             this.checkAssetsButton.TabIndex = 5;
             this.checkAssetsButton.Text = "Check assets";
             this.checkAssetsButton.UseVisualStyleBackColor = true;
@@ -112,7 +125,7 @@
             // 
             // databaseFileSelectButton
             // 
-            this.databaseFileSelectButton.Location = new System.Drawing.Point(29, 91);
+            this.databaseFileSelectButton.Location = new System.Drawing.Point(6, 98);
             this.databaseFileSelectButton.Name = "databaseFileSelectButton";
             this.databaseFileSelectButton.Size = new System.Drawing.Size(128, 23);
             this.databaseFileSelectButton.TabIndex = 6;
@@ -123,7 +136,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(30, 75);
+            this.label3.Location = new System.Drawing.Point(6, 82);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(162, 13);
             this.label3.TabIndex = 7;
@@ -132,9 +145,9 @@
             // dbLocationTextBox
             // 
             this.dbLocationTextBox.Enabled = false;
-            this.dbLocationTextBox.Location = new System.Drawing.Point(174, 94);
+            this.dbLocationTextBox.Location = new System.Drawing.Point(140, 100);
             this.dbLocationTextBox.Name = "dbLocationTextBox";
-            this.dbLocationTextBox.Size = new System.Drawing.Size(245, 20);
+            this.dbLocationTextBox.Size = new System.Drawing.Size(213, 20);
             this.dbLocationTextBox.TabIndex = 8;
             // 
             // openFileDialog1
@@ -143,7 +156,8 @@
             // 
             // loginIdTextBox
             // 
-            this.loginIdTextBox.Location = new System.Drawing.Point(86, 142);
+            this.loginIdTextBox.Enabled = false;
+            this.loginIdTextBox.Location = new System.Drawing.Point(77, 19);
             this.loginIdTextBox.Name = "loginIdTextBox";
             this.loginIdTextBox.Size = new System.Drawing.Size(71, 20);
             this.loginIdTextBox.TabIndex = 9;
@@ -152,7 +166,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(27, 145);
+            this.label4.Location = new System.Drawing.Point(18, 22);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(53, 13);
             this.label4.TabIndex = 10;
@@ -161,7 +175,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(171, 145);
+            this.label5.Location = new System.Drawing.Point(162, 22);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(53, 13);
             this.label5.TabIndex = 11;
@@ -169,35 +183,126 @@
             // 
             // assetIdTextBox
             // 
-            this.assetIdTextBox.Location = new System.Drawing.Point(230, 142);
+            this.assetIdTextBox.Enabled = false;
+            this.assetIdTextBox.Location = new System.Drawing.Point(221, 19);
             this.assetIdTextBox.Name = "assetIdTextBox";
-            this.assetIdTextBox.Size = new System.Drawing.Size(188, 20);
+            this.assetIdTextBox.Size = new System.Drawing.Size(71, 20);
             this.assetIdTextBox.TabIndex = 12;
             this.assetIdTextBox.TextChanged += new System.EventHandler(this.AssetIdTextBox_TextChanged);
+            // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.Location = new System.Drawing.Point(6, 19);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.Size = new System.Drawing.Size(155, 20);
+            this.dateTimePicker1.TabIndex = 13;
+            // 
+            // beforeRadioButton
+            // 
+            this.beforeRadioButton.AutoSize = true;
+            this.beforeRadioButton.Location = new System.Drawing.Point(23, 59);
+            this.beforeRadioButton.Name = "beforeRadioButton";
+            this.beforeRadioButton.Size = new System.Drawing.Size(55, 17);
+            this.beforeRadioButton.TabIndex = 15;
+            this.beforeRadioButton.TabStop = true;
+            this.beforeRadioButton.Text = "before";
+            this.beforeRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // afterRadioButton
+            // 
+            this.afterRadioButton.AutoSize = true;
+            this.afterRadioButton.Location = new System.Drawing.Point(99, 58);
+            this.afterRadioButton.Name = "afterRadioButton";
+            this.afterRadioButton.Size = new System.Drawing.Size(46, 17);
+            this.afterRadioButton.TabIndex = 16;
+            this.afterRadioButton.TabStop = true;
+            this.afterRadioButton.Text = "after";
+            this.afterRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(20, 42);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(125, 13);
+            this.label7.TabIndex = 17;
+            this.label7.Text = "show before or after date";
+            // 
+            // settingsGroupBox
+            // 
+            this.settingsGroupBox.Controls.Add(this.dataSettingsGroupBox);
+            this.settingsGroupBox.Controls.Add(this.dateFilteringGroupBox);
+            this.settingsGroupBox.Controls.Add(this.checkAssetsButton);
+            this.settingsGroupBox.Location = new System.Drawing.Point(12, 12);
+            this.settingsGroupBox.Name = "settingsGroupBox";
+            this.settingsGroupBox.Size = new System.Drawing.Size(584, 156);
+            this.settingsGroupBox.TabIndex = 18;
+            this.settingsGroupBox.TabStop = false;
+            this.settingsGroupBox.Enter += new System.EventHandler(this.GroupBox1_Enter);
+            // 
+            // dateFilteringGroupBox
+            // 
+            this.dateFilteringGroupBox.Controls.Add(this.dateTimePicker1);
+            this.dateFilteringGroupBox.Controls.Add(this.afterRadioButton);
+            this.dateFilteringGroupBox.Controls.Add(this.label7);
+            this.dateFilteringGroupBox.Controls.Add(this.beforeRadioButton);
+            this.dateFilteringGroupBox.Location = new System.Drawing.Point(395, 19);
+            this.dateFilteringGroupBox.Name = "dateFilteringGroupBox";
+            this.dateFilteringGroupBox.Size = new System.Drawing.Size(167, 81);
+            this.dateFilteringGroupBox.TabIndex = 18;
+            this.dateFilteringGroupBox.TabStop = false;
+            this.dateFilteringGroupBox.Text = "Date filtering (not functional)";
+            // 
+            // dataSettingsGroupBox
+            // 
+            this.dataSettingsGroupBox.Controls.Add(this.databaseFileSelectButton);
+            this.dataSettingsGroupBox.Controls.Add(this.dbLocationTextBox);
+            this.dataSettingsGroupBox.Controls.Add(this.label2);
+            this.dataSettingsGroupBox.Controls.Add(this.label1);
+            this.dataSettingsGroupBox.Controls.Add(this.assetNumberTextBox);
+            this.dataSettingsGroupBox.Controls.Add(this.label3);
+            this.dataSettingsGroupBox.Controls.Add(this.commandListComboBox);
+            this.dataSettingsGroupBox.Location = new System.Drawing.Point(6, 19);
+            this.dataSettingsGroupBox.Name = "dataSettingsGroupBox";
+            this.dataSettingsGroupBox.Size = new System.Drawing.Size(383, 129);
+            this.dataSettingsGroupBox.TabIndex = 19;
+            this.dataSettingsGroupBox.TabStop = false;
+            this.dataSettingsGroupBox.Text = "Data retrieval settings";
+            // 
+            // dataGridGroupBox
+            // 
+            this.dataGridGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridGroupBox.Controls.Add(this.loginstatDataGrid);
+            this.dataGridGroupBox.Controls.Add(this.assetIdTextBox);
+            this.dataGridGroupBox.Controls.Add(this.loginIdTextBox);
+            this.dataGridGroupBox.Controls.Add(this.label5);
+            this.dataGridGroupBox.Controls.Add(this.label4);
+            this.dataGridGroupBox.Location = new System.Drawing.Point(12, 174);
+            this.dataGridGroupBox.Name = "dataGridGroupBox";
+            this.dataGridGroupBox.Size = new System.Drawing.Size(584, 345);
+            this.dataGridGroupBox.TabIndex = 19;
+            this.dataGridGroupBox.TabStop = false;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(608, 504);
-            this.Controls.Add(this.assetIdTextBox);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.loginIdTextBox);
-            this.Controls.Add(this.dbLocationTextBox);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.databaseFileSelectButton);
-            this.Controls.Add(this.checkAssetsButton);
-            this.Controls.Add(this.assetNumberTextBox);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.commandListComboBox);
-            this.Controls.Add(this.loginstatDataGrid);
+            this.ClientSize = new System.Drawing.Size(608, 531);
+            this.Controls.Add(this.dataGridGroupBox);
+            this.Controls.Add(this.settingsGroupBox);
             this.Name = "Form1";
             this.Text = "Gem. Veere Asset Monitor";
             ((System.ComponentModel.ISupportInitialize)(this.loginstatDataGrid)).EndInit();
+            this.settingsGroupBox.ResumeLayout(false);
+            this.dateFilteringGroupBox.ResumeLayout(false);
+            this.dateFilteringGroupBox.PerformLayout();
+            this.dataSettingsGroupBox.ResumeLayout(false);
+            this.dataSettingsGroupBox.PerformLayout();
+            this.dataGridGroupBox.ResumeLayout(false);
+            this.dataGridGroupBox.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -217,6 +322,14 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox assetIdTextBox;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.RadioButton beforeRadioButton;
+        private System.Windows.Forms.RadioButton afterRadioButton;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.GroupBox settingsGroupBox;
+        private System.Windows.Forms.GroupBox dateFilteringGroupBox;
+        private System.Windows.Forms.GroupBox dataSettingsGroupBox;
+        private System.Windows.Forms.GroupBox dataGridGroupBox;
     }
 }
 

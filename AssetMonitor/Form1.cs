@@ -32,18 +32,6 @@ namespace AssetMonitor
 
         }
 
-        private void CommandListComboBox_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            if (commandListComboBox.SelectedIndex == 1)
-            {
-                assetNumberTextBox.Enabled = true;
-            }
-            else
-            {
-                assetNumberTextBox.Enabled = false;
-            }
-            validateCheckAssetsButtonEnabled();
-        }
 
         private void DatabaseFileSelectButton_Click(object sender, EventArgs e)
         {
@@ -77,43 +65,92 @@ namespace AssetMonitor
                     cmd.CommandText = @"select * from loginstats group by werkplekid";
                     break;
                 case 1:
+                    cmd.CommandText = "select * from loginstats where werkplekId LIKE '%" + assetNumberTextBox.Text + "%'";
                     break;
                 case 2:
                     break;
             }
+            //TODO time check
+            if(beforeRadioButton.Checked || afterRadioButton.Checked)
+            {
+                if (beforeRadioButton.Checked)
+                {
+                }
+                else
+                {
+
+                }
+            }
+
             if (cmd.CommandText != null)
             {
                 using (SQLiteDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        loginstats.Add(new Loginstat((string)reader["datum"], (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
+                        loginstats.Add(new Loginstat(Convert.ToDateTime((string)reader["datum"]), (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
                     }
                 }
                 loginstatDataGrid.DataSource = loginstats;
                 loginstatDataGrid.Refresh();
+                validateFilterBoxesEnabled();
             }
             conn.Close();
         }
 
+        private void GroupBox1_Enter(object sender, EventArgs e)
+        {
+            if (checkAssetsButton.Enabled)
+                CheckAssetsButton_Click(sender, e);
+        }
+
+        #region check for enabled objects
         public void validateCheckAssetsButtonEnabled()
         {
-            if(dbLocationTextBox.Text != string.Empty && commandListComboBox.SelectedIndex != -1)
+            if (dbLocationTextBox.Text != string.Empty && commandListComboBox.SelectedIndex != -1)
             {
                 checkAssetsButton.Enabled = true;
-            } else
+            }
+            else
             {
                 checkAssetsButton.Enabled = false;
             }
         }
 
+        public void validateFilterBoxesEnabled()
+        {
+            if (loginstats.Count != 0)
+            {
+                assetIdTextBox.Enabled = true;
+                loginIdTextBox.Enabled = true;
+            } else
+            {
+                assetIdTextBox.Enabled = false;
+                loginIdTextBox.Enabled = false;
+            }
+        }
+
+        
+        private void CommandListComboBox_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            if (commandListComboBox.SelectedIndex == 1)
+            {
+                assetNumberTextBox.Enabled = true;
+            }
+            else
+            {
+                assetNumberTextBox.Enabled = false;
+            }
+            validateCheckAssetsButtonEnabled();
+        }
+        #endregion
 
         #region filters
         //TODO replace filters with more efficient ones using LINQ if time left
         private void LoginIdTextBox_TextChanged(object sender, EventArgs e)
         {
             var filteredStats = new List<Loginstat>();
-            foreach(Loginstat stat in loginstats)
+            foreach (Loginstat stat in loginstats)
             {
                 if (stat.LoginId.Contains(loginIdTextBox.Text))
                     filteredStats.Add(stat);
@@ -131,6 +168,7 @@ namespace AssetMonitor
             }
             loginstatDataGrid.DataSource = filteredStats;
         }
+
 
         #endregion
     }
