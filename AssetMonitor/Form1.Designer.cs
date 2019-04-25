@@ -41,7 +41,7 @@
             this.loginIdTextBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.workspaceIdTextBox = new System.Windows.Forms.TextBox();
+            this.assetIdTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.loginstatDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -163,24 +163,24 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(171, 145);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(82, 13);
+            this.label5.Size = new System.Drawing.Size(53, 13);
             this.label5.TabIndex = 11;
-            this.label5.Text = "Workspace ID :";
+            this.label5.Text = "Asset ID :";
             // 
-            // workspaceIdTextBox
+            // assetIdTextBox
             // 
-            this.workspaceIdTextBox.Location = new System.Drawing.Point(259, 142);
-            this.workspaceIdTextBox.Name = "workspaceIdTextBox";
-            this.workspaceIdTextBox.Size = new System.Drawing.Size(159, 20);
-            this.workspaceIdTextBox.TabIndex = 12;
-            this.workspaceIdTextBox.TextChanged += new System.EventHandler(this.WorkspaceIdTextBox_TextChanged);
+            this.assetIdTextBox.Location = new System.Drawing.Point(230, 142);
+            this.assetIdTextBox.Name = "assetIdTextBox";
+            this.assetIdTextBox.Size = new System.Drawing.Size(188, 20);
+            this.assetIdTextBox.TabIndex = 12;
+            this.assetIdTextBox.TextChanged += new System.EventHandler(this.AssetIdTextBox_TextChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 504);
-            this.Controls.Add(this.workspaceIdTextBox);
+            this.Controls.Add(this.assetIdTextBox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.loginIdTextBox);
@@ -216,7 +216,7 @@
         private System.Windows.Forms.TextBox loginIdTextBox;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox workspaceIdTextBox;
+        private System.Windows.Forms.TextBox assetIdTextBox;
     }
 }
 

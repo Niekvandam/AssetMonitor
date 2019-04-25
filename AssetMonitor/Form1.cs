@@ -18,7 +18,7 @@ namespace AssetMonitor
         private string databaseLocation;
         private SQLiteConnection conn;
         private SQLiteCommand cmd;
-
+        private BindingList<Loginstat> loginstats = new BindingList<Loginstat>();
 
         public Form1()
         {
@@ -69,7 +69,7 @@ namespace AssetMonitor
 
         private void CheckAssetsButton_Click(object sender, EventArgs e)
         {
-            BindingList<Loginstat> loginstats = new BindingList<Loginstat>();
+            loginstats.Clear();
             conn.Open();
             switch (commandListComboBox.SelectedIndex)
             {
@@ -107,14 +107,31 @@ namespace AssetMonitor
             }
         }
 
+
+        #region filters
+        //TODO replace filters with more efficient ones using LINQ if time left
         private void LoginIdTextBox_TextChanged(object sender, EventArgs e)
         {
-
+            var filteredStats = new List<Loginstat>();
+            foreach(Loginstat stat in loginstats)
+            {
+                if (stat.LoginId.Contains(loginIdTextBox.Text))
+                    filteredStats.Add(stat);
+            }
+            loginstatDataGrid.DataSource = filteredStats;
         }
 
-        private void WorkspaceIdTextBox_TextChanged(object sender, EventArgs e)
+        private void AssetIdTextBox_TextChanged(object sender, EventArgs e)
         {
-
+            var filteredStats = new List<Loginstat>();
+            foreach (Loginstat stat in loginstats)
+            {
+                if (stat.AssetId.Contains(assetIdTextBox.Text))
+                    filteredStats.Add(stat);
+            }
+            loginstatDataGrid.DataSource = filteredStats;
         }
+
+        #endregion
     }
 }
