@@ -36,7 +36,8 @@
             this.checkAssetsButton = new System.Windows.Forms.Button();
             this.databaseFileSelectButton = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.dbLocationTextBox = new System.Windows.Forms.TextBox();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -118,20 +119,24 @@
             this.label3.TabIndex = 7;
             this.label3.Text = "Database file to check assets on (must be .db)";
             // 
-            // textBox2
+            // dbLocationTextBox
             // 
-            this.textBox2.Enabled = false;
-            this.textBox2.Location = new System.Drawing.Point(171, 92);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(245, 20);
-            this.textBox2.TabIndex = 8;
+            this.dbLocationTextBox.Enabled = false;
+            this.dbLocationTextBox.Location = new System.Drawing.Point(171, 92);
+            this.dbLocationTextBox.Name = "dbLocationTextBox";
+            this.dbLocationTextBox.Size = new System.Drawing.Size(245, 20);
+            this.dbLocationTextBox.TabIndex = 8;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(450, 504);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.dbLocationTextBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.databaseFileSelectButton);
             this.Controls.Add(this.checkAssetsButton);
@@ -158,7 +163,8 @@
         private System.Windows.Forms.Button checkAssetsButton;
         private System.Windows.Forms.Button databaseFileSelectButton;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox dbLocationTextBox;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
 
