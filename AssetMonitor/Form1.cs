@@ -9,12 +9,15 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.SQLite;
 
 namespace AssetMonitor
 {
     public partial class Form1 : Form
     {
         private string databaseLocation;
+        private SQLiteConnection conn;
+        private SQLiteCommand cmd;
         public Form1()
         {
             InitializeComponent();
@@ -22,7 +25,9 @@ namespace AssetMonitor
 
         private void InitializeDataBase()
         {
-            string myConnectionString = "Data Source=" + databaseLocation + " ;Version=3;";
+            conn = new SQLiteConnection("data source=" + databaseLocation);
+            cmd = new SQLiteCommand(conn);
+
         }
 
         private void CommandListComboBox_SelectionChangeCommitted(object sender, EventArgs e)
@@ -44,7 +49,7 @@ namespace AssetMonitor
                 }
                 catch (SecurityException ex)
                 {
-                    MessageBox.Show($"Security error. \n\n Error message: {ex.Message} \n\n" + 
+                    MessageBox.Show($"Security error. \n\n Error message: {ex.Message} \n\n" +
                         $"Details: \n\n{ex.StackTrace}");
                 }
 
