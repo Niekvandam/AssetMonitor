@@ -13,14 +13,14 @@ using System.Data.SQLite;
 
 namespace AssetMonitor
 {
-    public partial class Form1 : Form
+    public partial class AssetMonitor : Form
     {
         private string databaseLocation;
         private SQLiteConnection conn;
         private SQLiteCommand cmd;
         private BindingList<Loginstat> loginstats = new BindingList<Loginstat>();
 
-        public Form1()
+        public AssetMonitor()
         {
             InitializeComponent();
         }
@@ -65,13 +65,13 @@ namespace AssetMonitor
                     cmd.CommandText = @"select * from loginstats group by werkplekid";
                     break;
                 case 1:
-                    cmd.CommandText = "select * from loginstats where werkplekId LIKE '%" + assetNumberTextBox.Text + "%'";
+                    cmd.CommandText = @"select * from loginstats where werkplekId LIKE '%" + assetNumberTextBox.Text + "%'";
                     break;
                 case 2:
                     break;
             }
             //TODO time check
-            if(beforeRadioButton.Checked || afterRadioButton.Checked)
+            if (beforeRadioButton.Checked || afterRadioButton.Checked)
             {
                 if (beforeRadioButton.Checked)
                 {
@@ -96,6 +96,19 @@ namespace AssetMonitor
                 validateFilterBoxesEnabled();
             }
             conn.Close();
+        }
+        private void LoginstatDataGrid_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var userId = loginstatDataGrid.Rows[e.RowIndex].Cells[3].Value.ToString(); ;
+            if (userId != null)
+            {
+                UserData userDataForm = new UserData(conn, userId);
+                userDataForm.Show();
+            }
+            else
+            {
+                MessageBox.Show("Invalid column selected!");
+            }
         }
 
         private void GroupBox1_Enter(object sender, EventArgs e)
@@ -123,22 +136,26 @@ namespace AssetMonitor
             {
                 assetIdTextBox.Enabled = true;
                 loginIdTextBox.Enabled = true;
-            } else
+            }
+            else
             {
                 assetIdTextBox.Enabled = false;
                 loginIdTextBox.Enabled = false;
             }
         }
 
-        
+
         private void CommandListComboBox_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (commandListComboBox.SelectedIndex == 1)
             {
                 assetNumberTextBox.Enabled = true;
             }
-            else
+            else if (commandListComboBox.SelectedIndex == 3){
+                dateFilteringGroupBox.Enabled = true;
+            }else
             {
+                dateFilteringGroupBox.Enabled = false;
                 assetNumberTextBox.Enabled = false;
             }
             validateCheckAssetsButtonEnabled();
@@ -171,5 +188,6 @@ namespace AssetMonitor
 
 
         #endregion
+
     }
 }

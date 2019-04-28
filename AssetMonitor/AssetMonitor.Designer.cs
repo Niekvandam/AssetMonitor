@@ -1,6 +1,6 @@
 ﻿namespace AssetMonitor
 {
-    partial class Form1
+    partial class AssetMonitor
     {
         /// <summary>
         /// Required designer variable.
@@ -47,13 +47,13 @@
             this.afterRadioButton = new System.Windows.Forms.RadioButton();
             this.label7 = new System.Windows.Forms.Label();
             this.settingsGroupBox = new System.Windows.Forms.GroupBox();
-            this.dateFilteringGroupBox = new System.Windows.Forms.GroupBox();
             this.dataSettingsGroupBox = new System.Windows.Forms.GroupBox();
+            this.dateFilteringGroupBox = new System.Windows.Forms.GroupBox();
             this.dataGridGroupBox = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.loginstatDataGrid)).BeginInit();
             this.settingsGroupBox.SuspendLayout();
-            this.dateFilteringGroupBox.SuspendLayout();
             this.dataSettingsGroupBox.SuspendLayout();
+            this.dateFilteringGroupBox.SuspendLayout();
             this.dataGridGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,11 +66,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.loginstatDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.loginstatDataGrid.Location = new System.Drawing.Point(21, 45);
+            this.loginstatDataGrid.Location = new System.Drawing.Point(6, 45);
             this.loginstatDataGrid.Name = "loginstatDataGrid";
             this.loginstatDataGrid.ReadOnly = true;
-            this.loginstatDataGrid.Size = new System.Drawing.Size(541, 272);
+            this.loginstatDataGrid.Size = new System.Drawing.Size(572, 294);
             this.loginstatDataGrid.TabIndex = 0;
+            this.loginstatDataGrid.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.LoginstatDataGrid_CellContentDoubleClick);
             // 
             // commandListComboBox
             // 
@@ -240,19 +241,6 @@
             this.settingsGroupBox.TabStop = false;
             this.settingsGroupBox.Enter += new System.EventHandler(this.GroupBox1_Enter);
             // 
-            // dateFilteringGroupBox
-            // 
-            this.dateFilteringGroupBox.Controls.Add(this.dateTimePicker1);
-            this.dateFilteringGroupBox.Controls.Add(this.afterRadioButton);
-            this.dateFilteringGroupBox.Controls.Add(this.label7);
-            this.dateFilteringGroupBox.Controls.Add(this.beforeRadioButton);
-            this.dateFilteringGroupBox.Location = new System.Drawing.Point(395, 19);
-            this.dateFilteringGroupBox.Name = "dateFilteringGroupBox";
-            this.dateFilteringGroupBox.Size = new System.Drawing.Size(167, 81);
-            this.dateFilteringGroupBox.TabIndex = 18;
-            this.dateFilteringGroupBox.TabStop = false;
-            this.dateFilteringGroupBox.Text = "Date filtering (not functional)";
-            // 
             // dataSettingsGroupBox
             // 
             this.dataSettingsGroupBox.Controls.Add(this.databaseFileSelectButton);
@@ -268,6 +256,20 @@
             this.dataSettingsGroupBox.TabIndex = 19;
             this.dataSettingsGroupBox.TabStop = false;
             this.dataSettingsGroupBox.Text = "Data retrieval settings";
+            // 
+            // dateFilteringGroupBox
+            // 
+            this.dateFilteringGroupBox.Controls.Add(this.dateTimePicker1);
+            this.dateFilteringGroupBox.Controls.Add(this.afterRadioButton);
+            this.dateFilteringGroupBox.Controls.Add(this.label7);
+            this.dateFilteringGroupBox.Controls.Add(this.beforeRadioButton);
+            this.dateFilteringGroupBox.Enabled = false;
+            this.dateFilteringGroupBox.Location = new System.Drawing.Point(395, 19);
+            this.dateFilteringGroupBox.Name = "dateFilteringGroupBox";
+            this.dateFilteringGroupBox.Size = new System.Drawing.Size(167, 81);
+            this.dateFilteringGroupBox.TabIndex = 18;
+            this.dateFilteringGroupBox.TabStop = false;
+            this.dateFilteringGroupBox.Text = "Date filtering (not functional)";
             // 
             // dataGridGroupBox
             // 
@@ -285,21 +287,21 @@
             this.dataGridGroupBox.TabIndex = 19;
             this.dataGridGroupBox.TabStop = false;
             // 
-            // Form1
+            // AssetMonitor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 531);
             this.Controls.Add(this.dataGridGroupBox);
             this.Controls.Add(this.settingsGroupBox);
-            this.Name = "Form1";
+            this.Name = "AssetMonitor";
             this.Text = "Gem. Veere Asset Monitor";
             ((System.ComponentModel.ISupportInitialize)(this.loginstatDataGrid)).EndInit();
             this.settingsGroupBox.ResumeLayout(false);
-            this.dateFilteringGroupBox.ResumeLayout(false);
-            this.dateFilteringGroupBox.PerformLayout();
             this.dataSettingsGroupBox.ResumeLayout(false);
             this.dataSettingsGroupBox.PerformLayout();
+            this.dateFilteringGroupBox.ResumeLayout(false);
+            this.dateFilteringGroupBox.PerformLayout();
             this.dataGridGroupBox.ResumeLayout(false);
             this.dataGridGroupBox.PerformLayout();
             this.ResumeLayout(false);
