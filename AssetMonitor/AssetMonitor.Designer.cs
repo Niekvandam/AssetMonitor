@@ -42,7 +42,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.assetIdTextBox = new System.Windows.Forms.TextBox();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.filterDatePicker = new System.Windows.Forms.DateTimePicker();
             this.beforeRadioButton = new System.Windows.Forms.RadioButton();
             this.afterRadioButton = new System.Windows.Forms.RadioButton();
             this.label7 = new System.Windows.Forms.Label();
@@ -191,12 +191,12 @@
             this.assetIdTextBox.TabIndex = 12;
             this.assetIdTextBox.TextChanged += new System.EventHandler(this.AssetIdTextBox_TextChanged);
             // 
-            // dateTimePicker1
+            // filterDatePicker
             // 
-            this.dateTimePicker1.Location = new System.Drawing.Point(6, 19);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(155, 20);
-            this.dateTimePicker1.TabIndex = 13;
+            this.filterDatePicker.Location = new System.Drawing.Point(6, 19);
+            this.filterDatePicker.Name = "filterDatePicker";
+            this.filterDatePicker.Size = new System.Drawing.Size(155, 20);
+            this.filterDatePicker.TabIndex = 13;
             // 
             // beforeRadioButton
             // 
@@ -259,7 +259,7 @@
             // 
             // dateFilteringGroupBox
             // 
-            this.dateFilteringGroupBox.Controls.Add(this.dateTimePicker1);
+            this.dateFilteringGroupBox.Controls.Add(this.filterDatePicker);
             this.dateFilteringGroupBox.Controls.Add(this.afterRadioButton);
             this.dateFilteringGroupBox.Controls.Add(this.label7);
             this.dateFilteringGroupBox.Controls.Add(this.beforeRadioButton);
@@ -324,7 +324,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox assetIdTextBox;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.DateTimePicker filterDatePicker;
         private System.Windows.Forms.RadioButton beforeRadioButton;
         private System.Windows.Forms.RadioButton afterRadioButton;
         private System.Windows.Forms.Label label7;

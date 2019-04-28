@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SQLite;
+using System.Globalization;
 
 namespace AssetMonitor
 {
@@ -57,8 +58,10 @@ namespace AssetMonitor
 
         private void CheckAssetsButton_Click(object sender, EventArgs e)
         {
-            loginstats.Clear();
-            conn.Open();
+
+            string filterDate = filterDatePicker.Value.ToString("yyyyMMdd");
+            string betweenDate = string.Empty;
+
             switch (commandListComboBox.SelectedIndex)
             {
                 case 0:
@@ -69,19 +72,25 @@ namespace AssetMonitor
                     break;
                 case 2:
                     break;
+                case 3:
+                    if (beforeRadioButton.Checked || afterRadioButton.Checked)
+                    {
+                        if (afterRadioButton.Checked)
+                        {
+                            betweenDate = DateTime.Today.ToString("yyyyMMdd");
+                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) BETWEEN DATE('" + filterDate + "') AND DATE('" + betweenDate + "')";
+                        }
+                        else
+                        {
+                            betweenDate = DateTime.MinValue.ToString("yyyyMMdd");
+                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) BETWEEN DATE('" + betweenDate + "') AND DATE('" + filterDate + "')";
+                        }
+                    }
+                    break;
             }
-            //TODO time check
-            if (beforeRadioButton.Checked || afterRadioButton.Checked)
-            {
-                if (beforeRadioButton.Checked)
-                {
-                }
-                else
-                {
 
-                }
-            }
-
+            loginstats.Clear();
+            conn.Open();
             if (cmd.CommandText != null)
             {
                 using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -151,9 +160,11 @@ namespace AssetMonitor
             {
                 assetNumberTextBox.Enabled = true;
             }
-            else if (commandListComboBox.SelectedIndex == 3){
+            else if (commandListComboBox.SelectedIndex == 3)
+            {
                 dateFilteringGroupBox.Enabled = true;
-            }else
+            }
+            else
             {
                 dateFilteringGroupBox.Enabled = false;
                 assetNumberTextBox.Enabled = false;
