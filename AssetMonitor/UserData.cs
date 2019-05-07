@@ -13,34 +13,67 @@ namespace AssetMonitor
 {
     public partial class UserData : Form
     {
-        private SQLiteConnection conn;
-        private SQLiteCommand cmd;
-        private string loginId;
-        private List<Loginstat> loginstats = new List<Loginstat>();
+        private SQLiteConnection _conn;
+        private SQLiteCommand _cmd;
+        private string _loginId;
+        private List<Loginstat> _loginstats = new List<Loginstat>();
+        private User _currentUser;
 
         public UserData(SQLiteConnection dbconnection, string loginId)
         {
             InitializeComponent();
-            conn = dbconnection;
-            this.loginId = loginId;
+            _conn = dbconnection;
+            this._loginId = loginId;
             InitializeDataGrid();
+            InitializeUserData();
         }
+
+        private void InitializeUserData()
+        {
+            _conn.Open();
+            _cmd.CommandText = @"Select * from ADusers where loginId = '" + _loginId + "'";
+            SQLiteDataReader reader = _cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                _currentUser = new User((string)reader["Department"], (string)reader["Name"], (string)reader["JobTitle"], (string)reader["Telephone"], (string)reader["Email"], bool.Parse((string)reader["Active"]));
+            }
+            this.Name = _currentUser.Name;
+
+            firstNameTextBox.Text = _currentUser.Name;
+            eMailTextBox.Text = _currentUser.Email;
+            phoneNumberTextBox.Text = _currentUser.Telephone;
+            jobTextBox.Text = _currentUser.Job;
+            deptTextBox.Text = _currentUser.Department;
+
+            if (_currentUser.isActive)
+            {
+                activeTrue.Checked = true;
+            }
+            else
+            {
+                activeFalse.Checked = true;
+            }
+            //Set header title to name
+            //this.Name = 
+            _conn.Close();
+        }
+
 
         private void InitializeDataGrid()
         {
-            conn.Open();
-            cmd = new SQLiteCommand(conn);
-            cmd.CommandText = @"Select * from loginstats where loginId = '" + loginId + "'";
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
+            _conn.Open();
+            _cmd = new SQLiteCommand(_conn);
+            _cmd.CommandText = @"Select * from loginstats where loginId = '" + _loginId + "'";
+            using (SQLiteDataReader reader = _cmd.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    loginstats.Add(new Loginstat(Convert.ToDateTime((string)reader["datum"]), (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
+                    _loginstats.Add(new Loginstat(Convert.ToDateTime((string)reader["datum"]), (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
                 }
             }
-            userDataGrid.DataSource = loginstats;
+            userDataGrid.DataSource = _loginstats;
             userDataGrid.Refresh();
-            conn.Close();
+            _conn.Close();
         }
 
         private void CloseButton_Click(object sender, EventArgs e)
