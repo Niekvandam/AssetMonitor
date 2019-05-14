@@ -54,7 +54,7 @@ namespace AssetMonitor
                 activeFalse.Checked = true;
             }
             //Set header title to name
-            //this.Name = 
+            this.Text = "User data of " +  _currentUser.Name;
             _conn.Close();
         }
 

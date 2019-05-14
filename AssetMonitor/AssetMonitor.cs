@@ -77,13 +77,12 @@ namespace AssetMonitor
                     {
                         if (afterRadioButton.Checked)
                         {
-                            betweenDate = DateTime.Today.ToString("yyyyMMdd");
-                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) BETWEEN DATE('" + filterDate + "') AND DATE('" + betweenDate + "')";
+                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) >= '"  +  filterDate + "'";
                         }
                         else
                         {
-                            betweenDate = DateTime.MinValue.ToString("yyyyMMdd");
-                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) BETWEEN DATE('" + betweenDate + "') AND DATE('" + filterDate + "')";
+                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) <= '" + filterDate + "'";
+
                         }
                     }
                     break;
