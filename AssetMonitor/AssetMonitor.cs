@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
-using System.Drawing;
-using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.SQLite;
-using System.Globalization;
 
 namespace AssetMonitor
 {
@@ -77,7 +70,7 @@ namespace AssetMonitor
                     {
                         if (afterRadioButton.Checked)
                         {
-                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) >= '"  +  filterDate + "'";
+                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) >= '" + filterDate + "'";
                         }
                         else
                         {
@@ -107,16 +100,10 @@ namespace AssetMonitor
         }
         private void LoginstatDataGrid_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            var userId = loginstatDataGrid.Rows[e.RowIndex].Cells[3].Value.ToString(); ;
-            if (userId != null)
-            {
-                UserData userDataForm = new UserData(conn, userId);
-                userDataForm.Show();
-            }
-            else
-            {
-                MessageBox.Show("Invalid column selected!");
-            }
+            var userId = loginstatDataGrid.Rows[e.RowIndex].Cells[3].Value.ToString();
+
+            UserData userDataForm = new UserData(conn, userId);
+            userDataForm.Show();
         }
 
         private void GroupBox1_Enter(object sender, EventArgs e)
