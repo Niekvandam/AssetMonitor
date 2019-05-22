@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Security;
 using System.Windows.Forms;
+using System.Xml;
+using MySql.Data;
+using MySql.Data.MySqlClient;
 
 namespace AssetMonitor
 {
@@ -12,22 +16,60 @@ namespace AssetMonitor
         private string databaseLocation;
         private SQLiteConnection conn;
         private SQLiteCommand cmd;
+        private SqlConnection liveConn;
+        private SqlCommand liveCmd;
         private BindingList<Loginstat> loginstats = new BindingList<Loginstat>();
         UserData userDataForm;
         static readonly string FORMATTED_DATE = " DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2))";
         static readonly string DATUM_ORDER_DESC = String.Format(" ORDER BY {0} DESC", FORMATTED_DATE);
-        static readonly string GROUP_WERKPLEKID = " GROUP BY werkplekid";
 
         public AssetMonitor()
         {
             InitializeComponent();
+            CreateLiveConnection();
             beforeRadioButton.Checked = true;
         }
 
-        private void InitializeDataBase()
+        private void CreateLiveConnection()
+        {
+            string username = string.Empty;
+            string password = string.Empty;
+            string server = string.Empty;
+            string database = string.Empty;
+
+            using (XmlReader reader = XmlReader.Create(@"C:\Users\wissej\Source\Repos\assetmonitor\AssetMonitor\settings.SECRET.xml"))
+            {
+                while (reader.Read())
+                {
+                    if (reader.IsStartElement())
+                    {
+                        switch (reader.Name.ToString())
+                        {
+                            case "live_server_name":
+                                server = reader.ReadString();
+                                break;
+                            case "live_server_db":
+                                database = reader.ReadString();
+                                break;
+                            case "live_server_user":
+                                username = reader.ReadString();
+                                break;
+                            case "live_server_pass":
+                                password = reader.ReadString();
+                                break;
+                        }
+                    }
+                }
+            }
+            liveConn = new SqlConnection(String.Format(@"Server={0};Database={1};User Id={2};Password={3}", server, database, username, password));
+        }
+
+        private void CreateLocalConnection()
         {
             conn = new SQLiteConnection("data source=" + databaseLocation);
             cmd = new SQLiteCommand(conn);
+            var xml = new XmlDocument();
+
 
         }
 
@@ -42,7 +84,7 @@ namespace AssetMonitor
                 {
                     databaseLocation = openFileDialog1.FileName;
                     dbLocationTextBox.Text = databaseLocation;
-                    InitializeDataBase();
+                    CreateLocalConnection();
                 }
                 catch (SecurityException ex)
                 {
@@ -57,14 +99,14 @@ namespace AssetMonitor
         {
 
             string filterDate = filterDatePicker.Value.ToString("yyyy-MM-dd");
-            
+
             switch (commandListComboBox.SelectedIndex)
             {
                 case 0:
-                    cmd.CommandText = string.Format(@"select * from loginstats {0} {1}", GROUP_WERKPLEKID, DATUM_ORDER_DESC);
+                    cmd.CommandText = String.Format("select *, MAX({0}) FROM loginstats GROUP BY werkplekid {1}", FORMATTED_DATE, DATUM_ORDER_DESC);
                     break;
                 case 1:
-                    cmd.CommandText = string.Format(@"select * from loginstats where werkplekid LIKE '%{0}%' {1}",  assetNumberTextBox.Text, DATUM_ORDER_DESC);
+                    cmd.CommandText = String.Format(@"select * from loginstats where werkplekid LIKE '%{0}%' {1}", assetNumberTextBox.Text, DATUM_ORDER_DESC);
                     break;
                 case 2:
                     break;
@@ -73,12 +115,11 @@ namespace AssetMonitor
                     {
                         if (afterRadioButton.Checked)
                         {
-                            cmd.CommandText = String.Format(@"SELECT * FROM loginstats WHERE {0} >= '{1}' {2} {3}", FORMATTED_DATE, filterDate, GROUP_WERKPLEKID, " ORDER BY datum DESC");
+                            cmd.CommandText = String.Format(@"SELECT * FROM loginstats WHERE {0} >= '{1}' {2}", FORMATTED_DATE, filterDate, DATUM_ORDER_DESC);
                         }
                         else
                         {
-                            cmd.CommandText = String.Format(@"SELECT * FROM loginstats WHERE {0} <= '{1}' {2} {3}", FORMATTED_DATE, filterDate, GROUP_WERKPLEKID, DATUM_ORDER_DESC);
-
+                            cmd.CommandText = String.Format(@"SELECT * FROM loginstats WHERE {0} <= '{1}' {2}", FORMATTED_DATE, filterDate, DATUM_ORDER_DESC);
                         }
                     }
                     break;
@@ -174,7 +215,7 @@ namespace AssetMonitor
             var filteredStats = new List<Loginstat>();
             foreach (Loginstat stat in loginstats)
             {
-                if (stat.AssetId.Contains(assetIdTextBox.Text))
+                if (stat.AssetId.ToLower().Contains(assetIdTextBox.Text.ToLower()))
                     filteredStats.Add(stat);
             }
             loginstatDataGrid.DataSource = filteredStats;

@@ -54,7 +54,7 @@ namespace AssetMonitor
                 activeFalse.Checked = true;
             }
             //Set header title to name
-            this.Text = "User data of " +  _currentUser.Name;
+            this.Text = "User data of " + _currentUser.Name;
             _conn.Close();
         }
 
@@ -81,6 +81,17 @@ namespace AssetMonitor
         private void CloseButton_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void TextBox1_TextChanged(object sender, EventArgs e)
+        {
+            var filteredStats = new List<Loginstat>();
+            foreach (Loginstat stat in _loginstats)
+            {
+                if (stat.AssetId.ToLower().Contains(textBox1.Text.ToLower()))
+                    filteredStats.Add(stat);
+            }
+            userDataGrid.DataSource = filteredStats;
         }
     }
 }
