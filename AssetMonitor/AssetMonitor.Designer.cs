@@ -239,7 +239,6 @@
             this.settingsGroupBox.Size = new System.Drawing.Size(584, 156);
             this.settingsGroupBox.TabIndex = 18;
             this.settingsGroupBox.TabStop = false;
-            this.settingsGroupBox.Enter += new System.EventHandler(this.GroupBox1_Enter);
             // 
             // dataSettingsGroupBox
             // 

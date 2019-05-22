@@ -13,10 +13,15 @@ namespace AssetMonitor
         private SQLiteConnection conn;
         private SQLiteCommand cmd;
         private BindingList<Loginstat> loginstats = new BindingList<Loginstat>();
+        UserData userDataForm;
+        static readonly string FORMATTED_DATE = " DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2))";
+        static readonly string DATUM_ORDER_DESC = String.Format(" ORDER BY {0} DESC", FORMATTED_DATE);
+        static readonly string GROUP_WERKPLEKID = " GROUP BY werkplekid";
 
         public AssetMonitor()
         {
             InitializeComponent();
+            beforeRadioButton.Checked = true;
         }
 
         private void InitializeDataBase()
@@ -44,7 +49,6 @@ namespace AssetMonitor
                     MessageBox.Show($"Security error. \n\n Error message: {ex.Message} \n\n" +
                         $"Details: \n\n{ex.StackTrace}");
                 }
-
             }
             validateCheckAssetsButtonEnabled();
         }
@@ -52,16 +56,15 @@ namespace AssetMonitor
         private void CheckAssetsButton_Click(object sender, EventArgs e)
         {
 
-            string filterDate = filterDatePicker.Value.ToString("yyyyMMdd");
-            string betweenDate = string.Empty;
-
+            string filterDate = filterDatePicker.Value.ToString("yyyy-MM-dd");
+            
             switch (commandListComboBox.SelectedIndex)
             {
                 case 0:
-                    cmd.CommandText = @"select * from loginstats group by werkplekid";
+                    cmd.CommandText = string.Format(@"select * from loginstats {0} {1}", GROUP_WERKPLEKID, DATUM_ORDER_DESC);
                     break;
                 case 1:
-                    cmd.CommandText = @"select * from loginstats where werkplekId LIKE '%" + assetNumberTextBox.Text + "%'";
+                    cmd.CommandText = string.Format(@"select * from loginstats where werkplekid LIKE '%{0}%' {1}",  assetNumberTextBox.Text, DATUM_ORDER_DESC);
                     break;
                 case 2:
                     break;
@@ -70,11 +73,11 @@ namespace AssetMonitor
                     {
                         if (afterRadioButton.Checked)
                         {
-                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) >= '" + filterDate + "'";
+                            cmd.CommandText = String.Format(@"SELECT * FROM loginstats WHERE {0} >= '{1}' {2} {3}", FORMATTED_DATE, filterDate, GROUP_WERKPLEKID, " ORDER BY datum DESC");
                         }
                         else
                         {
-                            cmd.CommandText = @"SELECT * FROM loginstats WHERE DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2)) <= '" + filterDate + "'";
+                            cmd.CommandText = String.Format(@"SELECT * FROM loginstats WHERE {0} <= '{1}' {2} {3}", FORMATTED_DATE, filterDate, GROUP_WERKPLEKID, DATUM_ORDER_DESC);
 
                         }
                     }
@@ -101,16 +104,10 @@ namespace AssetMonitor
         private void LoginstatDataGrid_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             var userId = loginstatDataGrid.Rows[e.RowIndex].Cells[3].Value.ToString();
-
-            UserData userDataForm = new UserData(conn, userId);
+            userDataForm = new UserData(conn, userId);
             userDataForm.Show();
         }
 
-        private void GroupBox1_Enter(object sender, EventArgs e)
-        {
-            if (checkAssetsButton.Enabled)
-                CheckAssetsButton_Click(sender, e);
-        }
 
         #region check for enabled objects
         public void validateCheckAssetsButtonEnabled()

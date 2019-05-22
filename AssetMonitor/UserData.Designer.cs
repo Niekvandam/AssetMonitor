@@ -29,24 +29,24 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.phoneNumberTextBox = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.activeFalse = new System.Windows.Forms.RadioButton();
+            this.activeTrue = new System.Windows.Forms.RadioButton();
+            this.label6 = new System.Windows.Forms.Label();
+            this.deptTextBox = new System.Windows.Forms.TextBox();
+            this.jobTextBox = new System.Windows.Forms.TextBox();
+            this.eMailTextBox = new System.Windows.Forms.TextBox();
+            this.firstNameTextBox = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.dataGridGroupBox = new System.Windows.Forms.GroupBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.userDataGrid = new System.Windows.Forms.DataGridView();
             this.closeButton = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.firstNameTextBox = new System.Windows.Forms.TextBox();
-            this.eMailTextBox = new System.Windows.Forms.TextBox();
-            this.jobTextBox = new System.Windows.Forms.TextBox();
-            this.deptTextBox = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.activeTrue = new System.Windows.Forms.RadioButton();
-            this.activeFalse = new System.Windows.Forms.RadioButton();
-            this.label7 = new System.Windows.Forms.Label();
-            this.phoneNumberTextBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.dataGridGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.userDataGrid)).BeginInit();
@@ -73,6 +73,123 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "User Data";
+            // 
+            // phoneNumberTextBox
+            // 
+            this.phoneNumberTextBox.Enabled = false;
+            this.phoneNumberTextBox.Location = new System.Drawing.Point(399, 36);
+            this.phoneNumberTextBox.Name = "phoneNumberTextBox";
+            this.phoneNumberTextBox.Size = new System.Drawing.Size(149, 20);
+            this.phoneNumberTextBox.TabIndex = 12;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(396, 21);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(76, 13);
+            this.label7.TabIndex = 11;
+            this.label7.Text = "Phone number";
+            // 
+            // activeFalse
+            // 
+            this.activeFalse.AutoSize = true;
+            this.activeFalse.Enabled = false;
+            this.activeFalse.Location = new System.Drawing.Point(396, 127);
+            this.activeFalse.Name = "activeFalse";
+            this.activeFalse.Size = new System.Drawing.Size(47, 17);
+            this.activeFalse.TabIndex = 10;
+            this.activeFalse.TabStop = true;
+            this.activeFalse.Text = "false";
+            this.activeFalse.UseVisualStyleBackColor = true;
+            // 
+            // activeTrue
+            // 
+            this.activeTrue.AutoSize = true;
+            this.activeTrue.Enabled = false;
+            this.activeTrue.Location = new System.Drawing.Point(396, 104);
+            this.activeTrue.Name = "activeTrue";
+            this.activeTrue.Size = new System.Drawing.Size(43, 17);
+            this.activeTrue.TabIndex = 9;
+            this.activeTrue.TabStop = true;
+            this.activeTrue.Text = "true";
+            this.activeTrue.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(205, 20);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(62, 13);
+            this.label6.TabIndex = 8;
+            this.label6.Text = "Department";
+            // 
+            // deptTextBox
+            // 
+            this.deptTextBox.Enabled = false;
+            this.deptTextBox.Location = new System.Drawing.Point(208, 37);
+            this.deptTextBox.Name = "deptTextBox";
+            this.deptTextBox.Size = new System.Drawing.Size(132, 20);
+            this.deptTextBox.TabIndex = 7;
+            // 
+            // jobTextBox
+            // 
+            this.jobTextBox.Enabled = false;
+            this.jobTextBox.Location = new System.Drawing.Point(208, 100);
+            this.jobTextBox.Name = "jobTextBox";
+            this.jobTextBox.Size = new System.Drawing.Size(132, 20);
+            this.jobTextBox.TabIndex = 5;
+            // 
+            // eMailTextBox
+            // 
+            this.eMailTextBox.Enabled = false;
+            this.eMailTextBox.Location = new System.Drawing.Point(10, 100);
+            this.eMailTextBox.Name = "eMailTextBox";
+            this.eMailTextBox.Size = new System.Drawing.Size(168, 20);
+            this.eMailTextBox.TabIndex = 4;
+            // 
+            // firstNameTextBox
+            // 
+            this.firstNameTextBox.Enabled = false;
+            this.firstNameTextBox.Location = new System.Drawing.Point(10, 37);
+            this.firstNameTextBox.Name = "firstNameTextBox";
+            this.firstNameTextBox.Size = new System.Drawing.Size(100, 20);
+            this.firstNameTextBox.TabIndex = 3;
+            // 
+            // label5
+            // 
+            this.label5.Location = new System.Drawing.Point(393, 84);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(39, 13);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Active";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(205, 84);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(24, 13);
+            this.label4.TabIndex = 2;
+            this.label4.Text = "Job";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 84);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(32, 13);
+            this.label3.TabIndex = 1;
+            this.label3.Text = "Email";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(7, 20);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(57, 13);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "First Name";
             // 
             // dataGridGroupBox
             // 
@@ -130,123 +247,6 @@
             this.closeButton.Text = "Close";
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.CloseButton_Click);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 20);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(57, 13);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "First Name";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 84);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(32, 13);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "Email";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(205, 84);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(24, 13);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "Job";
-            // 
-            // label5
-            // 
-            this.label5.Location = new System.Drawing.Point(393, 84);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(39, 13);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "Active";
-            // 
-            // firstNameTextBox
-            // 
-            this.firstNameTextBox.Enabled = false;
-            this.firstNameTextBox.Location = new System.Drawing.Point(10, 37);
-            this.firstNameTextBox.Name = "firstNameTextBox";
-            this.firstNameTextBox.Size = new System.Drawing.Size(100, 20);
-            this.firstNameTextBox.TabIndex = 3;
-            // 
-            // eMailTextBox
-            // 
-            this.eMailTextBox.Enabled = false;
-            this.eMailTextBox.Location = new System.Drawing.Point(10, 100);
-            this.eMailTextBox.Name = "eMailTextBox";
-            this.eMailTextBox.Size = new System.Drawing.Size(168, 20);
-            this.eMailTextBox.TabIndex = 4;
-            // 
-            // jobTextBox
-            // 
-            this.jobTextBox.Enabled = false;
-            this.jobTextBox.Location = new System.Drawing.Point(208, 100);
-            this.jobTextBox.Name = "jobTextBox";
-            this.jobTextBox.Size = new System.Drawing.Size(100, 20);
-            this.jobTextBox.TabIndex = 5;
-            // 
-            // deptTextBox
-            // 
-            this.deptTextBox.Enabled = false;
-            this.deptTextBox.Location = new System.Drawing.Point(208, 37);
-            this.deptTextBox.Name = "deptTextBox";
-            this.deptTextBox.Size = new System.Drawing.Size(100, 20);
-            this.deptTextBox.TabIndex = 7;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(205, 20);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(62, 13);
-            this.label6.TabIndex = 8;
-            this.label6.Text = "Department";
-            // 
-            // activeTrue
-            // 
-            this.activeTrue.AutoSize = true;
-            this.activeTrue.Enabled = false;
-            this.activeTrue.Location = new System.Drawing.Point(396, 104);
-            this.activeTrue.Name = "activeTrue";
-            this.activeTrue.Size = new System.Drawing.Size(43, 17);
-            this.activeTrue.TabIndex = 9;
-            this.activeTrue.TabStop = true;
-            this.activeTrue.Text = "true";
-            this.activeTrue.UseVisualStyleBackColor = true;
-            // 
-            // activeFalse
-            // 
-            this.activeFalse.AutoSize = true;
-            this.activeFalse.Enabled = false;
-            this.activeFalse.Location = new System.Drawing.Point(396, 127);
-            this.activeFalse.Name = "activeFalse";
-            this.activeFalse.Size = new System.Drawing.Size(47, 17);
-            this.activeFalse.TabIndex = 10;
-            this.activeFalse.TabStop = true;
-            this.activeFalse.Text = "false";
-            this.activeFalse.UseVisualStyleBackColor = true;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(396, 21);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(76, 13);
-            this.label7.TabIndex = 11;
-            this.label7.Text = "Phone number";
-            // 
-            // phoneNumberTextBox
-            // 
-            this.phoneNumberTextBox.Enabled = false;
-            this.phoneNumberTextBox.Location = new System.Drawing.Point(399, 36);
-            this.phoneNumberTextBox.Name = "phoneNumberTextBox";
-            this.phoneNumberTextBox.Size = new System.Drawing.Size(149, 20);
-            this.phoneNumberTextBox.TabIndex = 12;
             // 
             // UserData
             // 

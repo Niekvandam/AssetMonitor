@@ -62,8 +62,10 @@ namespace AssetMonitor
         private void InitializeDataGrid()
         {
             _conn.Open();
-            _cmd = new SQLiteCommand(_conn);
-            _cmd.CommandText = @"Select * from loginstats where loginId = '" + _loginId + "'";
+            _cmd = new SQLiteCommand(_conn)
+            {
+                CommandText = @"Select * from loginstats where loginId = '" + _loginId + "'"
+            };
             using (SQLiteDataReader reader = _cmd.ExecuteReader())
             {
                 while (reader.Read())
