@@ -235,6 +235,7 @@
             this.userDataGrid.Location = new System.Drawing.Point(7, 47);
             this.userDataGrid.Name = "userDataGrid";
             this.userDataGrid.ReadOnly = true;
+            this.userDataGrid.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.userDataGrid.Size = new System.Drawing.Size(540, 197);
             this.userDataGrid.TabIndex = 0;
             // 
