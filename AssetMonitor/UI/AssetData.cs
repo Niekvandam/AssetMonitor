@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AssetMonitor.Databases;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +12,7 @@ using System.Windows.Forms;
 
 namespace AssetMonitor
 {
+    //TODO custom class for data retrieval from live DB
     public partial class AssetData : Form
     {
         //The assetId given when creating this class
@@ -24,13 +26,15 @@ namespace AssetMonitor
         private SqlConnection _liveConn;
         private bool isInDB = false;
 
+        private LocalDB _localDB;
+        private LiveDB _liveDB;
 
-        public AssetData(SqlConnection conn, string assetId, string localUser)
+        public AssetData(string connString, string assetId, string localUser)
         {
             InitializeComponent();
             _localUser = localUser;
             _assetId = assetId;
-            _liveConn = conn;
+            _liveDB = new LiveDB(connString);
             _liveCmd = new SqlCommand("", _liveConn);
             SetFormValues();
             initializeAssetData();
@@ -45,6 +49,7 @@ namespace AssetMonitor
 
         private void initializeAssetData()
         {
+            LiveDB liveDB = new LiveDB(_liveConn);
             _liveConn.Open();
             _liveCmd = new SqlCommand(getCommandTextWithParty(_assetId), _liveConn);
             using (SqlDataReader reader = _liveCmd.ExecuteReader())
@@ -96,17 +101,13 @@ namespace AssetMonitor
                     textBoxAssetNotFound.Text = "Users do not match in Clientele and Local DB";
                     textBoxAssetNotFound.Show();
                 }
+                isInDB = true;
             }
             else
             {
                 commentsTextBox.Text = (reader["Notes"] == DBNull.Value) ? "No notes available" : (string)reader["Notes"];
-
             }
             localUserTextBox.Text = _localUser;
-            isInDB = true;
-
-
-
         }
 
 
@@ -162,6 +163,7 @@ namespace AssetMonitor
         private void CloseButton_Click(object sender, EventArgs e)
         {
             this.Close();
+            GC.Collect();
         }
     }
 }

@@ -71,7 +71,7 @@
             this.loginstatDataGrid.ReadOnly = true;
             this.loginstatDataGrid.Size = new System.Drawing.Size(572, 294);
             this.loginstatDataGrid.TabIndex = 0;
-            this.loginstatDataGrid.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.LoginstatDataGrid_CellContentDoubleClick);
+            this.loginstatDataGrid.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.LoginstatDataGrid_CellContentClick);
             // 
             // commandListComboBox
             // 
@@ -79,8 +79,9 @@
             this.commandListComboBox.Items.AddRange(new object[] {
             "List all assets",
             "List all users of asset",
-            "List missing assets",
-            "List all assets with date check"});
+            "List missing assets (WIP)",
+            "List all assets with date check",
+            "List all assets with clientele check (WIP)"});
             this.commandListComboBox.Location = new System.Drawing.Point(6, 30);
             this.commandListComboBox.Name = "commandListComboBox";
             this.commandListComboBox.Size = new System.Drawing.Size(216, 21);

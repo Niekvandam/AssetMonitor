@@ -6,8 +6,7 @@ using System.Data.SQLite;
 using System.Security;
 using System.Windows.Forms;
 using System.Xml;
-using MySql.Data;
-using MySql.Data.MySqlClient;
+using AssetMonitor.Databases;
 
 namespace AssetMonitor
 {
@@ -29,10 +28,9 @@ namespace AssetMonitor
         private SQLiteConnection conn;
         private SQLiteCommand cmd;
         private SqlConnection liveConn;
+        private SqlCommand liveCmd;
 
-        //Variables used for sql query formatting
-        static readonly string FORMATTED_DATE = " DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2))";
-        static readonly string DATUM_ORDER_DESC = String.Format(" ORDER BY {0} DESC", FORMATTED_DATE);
+        private string _liveDBConnString;
 
         /// <summary>
         /// While creating the WinForm, read variables from the secret.xml and create both local and live connections
@@ -51,7 +49,7 @@ namespace AssetMonitor
         /// </summary>
         private void InitializeVariables()
         {
-            using (XmlReader reader = XmlReader.Create(@"C:\Users\wissej\Source\Repos\assetmonitor\AssetMonitor\settings.SECRET.xml"))
+            using (XmlReader reader = XmlReader.Create(@"C:\Users\DamN\Documents\Visual studio\AssetMonitor\AssetMonitor\settings.SECRET.xml"))
             {
                 while (reader.Read())
                 {
@@ -71,7 +69,7 @@ namespace AssetMonitor
                             case "live_server_pass":
                                 _password = reader.ReadString();
                                 break;
-                            case "local_db_location":
+                            case "local_db_path":
                                 _databaseLocation = reader.ReadString();
                                 break;
                         }
@@ -85,7 +83,9 @@ namespace AssetMonitor
         /// </summary>
         private void CreateLiveConnection()
         {
-            liveConn = new SqlConnection(String.Format(@"Server={0};Database={1};User Id={2};Password={3}", _server, _database, _username, _password));
+            _liveDBConnString = String.Format(@"Server={0};Database={1};User Id={2};Password={3}", _server, _database, _username, _password);
+            liveConn = new SqlConnection(_liveDBConnString);
+            liveCmd = new SqlCommand("", liveConn);
         }
 
         /// <summary>
@@ -132,34 +132,47 @@ namespace AssetMonitor
         /// <param name="e"></param>
         private void CheckAssetsButton_Click(object sender, EventArgs e)
         {
+            LocalDB localDB = new LocalDB("data source=" + _databaseLocation);
+            LiveDB liveDB = new LiveDB(String.Format(@"Server={0};Database={1};User Id={2};Password={3}", _server, _database, _username, _password));
+            SQLiteDataReader SQLiteDataResult;
 
             string filterDate = filterDatePicker.Value.ToString("yyyy-MM-dd");
-
-            switch (commandListComboBox.SelectedIndex)
+            int selectedCommand = commandListComboBox.SelectedIndex;
+            switch (selectedCommand)
             {
                 case 0:
-                    cmd.CommandText = String.Format("select *, MAX({0}) FROM loginstats GROUP BY werkplekid {1}", FORMATTED_DATE, DATUM_ORDER_DESC);
+                    SQLiteDataResult = localDB.GetCurrentAssetStats();
                     break;
                 case 1:
-                    cmd.CommandText = String.Format(@"select * from loginstats where werkplekid LIKE '%{0}%' {1}", assetNumberTextBox.Text, DATUM_ORDER_DESC);
+                    SQLiteDataResult = localDB.GetAssetStatsByName(assetNumberTextBox.Text);
                     break;
                 case 2:
-                    break;
+                    throw new NotImplementedException();
                 case 3:
                     if (beforeRadioButton.Checked || afterRadioButton.Checked)
                     {
                         if (afterRadioButton.Checked)
                         {
-                            cmd.CommandText = String.Format(@"SELECT * FROM loginstats WHERE {0} >= '{1}' {2}", FORMATTED_DATE, filterDate, DATUM_ORDER_DESC);
+                            SQLiteDataResult = localDB.GetAssetDataBetweenDatesGreater(filterDate);
                         }
                         else
                         {
-                            cmd.CommandText = String.Format(@"SELECT * FROM loginstats WHERE {0} <= '{1}' {2}", FORMATTED_DATE, filterDate, DATUM_ORDER_DESC);
+                            SQLiteDataResult = localDB.GetAssetDataBetweenDatesLesser(filterDate);
                         }
                     }
                     break;
+                case 4:
+                    SQLiteDataReader localResult = localDB.GetCurrentAssetStats();
+                    
+                    //TODO write good live DB query 
+                    //SqlDataReader liveResults = liveDB.GetUserDataWithParty();
+                    break;
             }
+            fillDataGrid(selectedCommand);
+        }
 
+        private void fillDataGrid(int selectedIndexFromDropdown)
+        {
             loginstats.Clear();
             conn.Open();
             if (cmd.CommandText != null)
@@ -168,7 +181,17 @@ namespace AssetMonitor
                 {
                     while (reader.Read())
                     {
+                        if (selectedIndexFromDropdown == 4)
+                        {
+                            using (SqlDataReader sqlReader = liveCmd.ExecuteReader())
+                            {
+
+                            }
+
+                            liveCmd.Parameters.AddWithValue("@assetId", (string)reader["werkplekid"]);
+                        }
                         loginstats.Add(new Loginstat(Convert.ToDateTime((string)reader["datum"]), (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
+
                     }
                 }
                 loginstatDataGrid.DataSource = loginstats;
@@ -177,30 +200,6 @@ namespace AssetMonitor
             }
             conn.Close();
         }
-
-        /// <summary>
-        /// When doubleclicked on a cell, open a userdataform. This is done by reading the userID of cell 3 and pass that to the new userdata class
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LoginstatDataGrid_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            var userId = loginstatDataGrid.Rows[e.RowIndex].Cells[3].Value.ToString();
-
-            if (e.ColumnIndex == 3)
-            {
-                userDataForm = new UserData(conn, userId);
-                userDataForm.Show();
-            }
-            else if (e.ColumnIndex == 4)
-            {
-                var assetId = loginstatDataGrid.Rows[e.RowIndex].Cells[4].Value.ToString();
-                assetDataForm = new AssetData(liveConn, assetId, userId);
-                assetDataForm.Show();
-            }
-
-        }
-
 
         #region check for enabled objects
 
@@ -294,7 +293,28 @@ namespace AssetMonitor
             }
             loginstatDataGrid.DataSource = filteredStats;
         }
+
         #endregion
 
+        private void LoginstatDataGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var userId = loginstatDataGrid.Rows[e.RowIndex].Cells[3].Value.ToString();
+
+            if (e.ColumnIndex == 0)
+            {
+                return;
+            }
+            if (e.ColumnIndex == 3)
+            {
+                userDataForm = new UserData(conn, userId);
+                userDataForm.Show();
+            }
+            else if (e.ColumnIndex == 4)
+            {
+                var assetId = loginstatDataGrid.Rows[e.RowIndex].Cells[4].Value.ToString();
+                assetDataForm = new AssetData(_liveDBConnString, assetId, userId);
+                assetDataForm.Show();
+            }
+        }
     }
 }
