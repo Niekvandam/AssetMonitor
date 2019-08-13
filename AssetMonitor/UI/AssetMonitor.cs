@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Reflection;
 using System.Security;
 using System.Windows.Forms;
 using System.Xml;
@@ -32,6 +37,10 @@ namespace AssetMonitor
 
         private string _liveDBConnString;
 
+
+        private LocalDB localDB;
+        private LiveDB liveDB;
+
         /// <summary>
         /// While creating the WinForm, read variables from the secret.xml and create both local and live connections
         /// </summary>
@@ -49,7 +58,9 @@ namespace AssetMonitor
         /// </summary>
         private void InitializeVariables()
         {
-            using (XmlReader reader = XmlReader.Create(@"C:\Users\DamN\Documents\Visual studio\AssetMonitor\AssetMonitor\settings.SECRET.xml"))
+            string assemblyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            string xmlPath = Path.Combine(assemblyPath, "settings.SECRET.xml");
+            using (XmlReader reader = XmlReader.Create(xmlPath))
             {
                 while (reader.Read())
                 {
@@ -69,8 +80,9 @@ namespace AssetMonitor
                             case "live_server_pass":
                                 _password = reader.ReadString();
                                 break;
-                            case "local_db_path":
-                                _databaseLocation = reader.ReadString();
+                            case "local_db_":
+                                if (reader.ReadString() != null)
+                                    _databaseLocation = reader.ReadString();
                                 break;
                         }
                     }
@@ -78,7 +90,7 @@ namespace AssetMonitor
             }
         }
 
-        /// <summary>
+        /// <summary
         /// Creates a connection with the live database with the variables previously read out in the xml reader
         /// </summary>
         private void CreateLiveConnection()
@@ -93,9 +105,12 @@ namespace AssetMonitor
         /// </summary>
         private void CreateLocalConnection()
         {
-            conn = new SQLiteConnection("data source=" + _databaseLocation);
-            cmd = new SQLiteCommand(conn);
-            dbLocationTextBox.Text = _databaseLocation;
+            if (_databaseLocation != null)
+            {
+                conn = new SQLiteConnection("data source=" + _databaseLocation);
+                cmd = new SQLiteCommand(conn);
+                dbLocationTextBox.Text = _databaseLocation;
+            }
         }
 
 
@@ -132,9 +147,11 @@ namespace AssetMonitor
         /// <param name="e"></param>
         private void CheckAssetsButton_Click(object sender, EventArgs e)
         {
-            LocalDB localDB = new LocalDB("data source=" + _databaseLocation);
-            LiveDB liveDB = new LiveDB(String.Format(@"Server={0};Database={1};User Id={2};Password={3}", _server, _database, _username, _password));
-            SQLiteDataReader SQLiteDataResult;
+            localDB = new LocalDB(new SQLiteConnection(@"data source=" + _databaseLocation));
+            liveDB = new LiveDB(new SqlConnection(String.Format(@"Server={0};Database={1};User Id={2};Password={3}", _server, _database, _username, _password)));
+            SQLiteDataReader SQLiteDataResult = null;
+            localDB._sqlConnection.Open();
+
 
             string filterDate = filterDatePicker.Value.ToString("yyyy-MM-dd");
             int selectedCommand = commandListComboBox.SelectedIndex;
@@ -163,42 +180,55 @@ namespace AssetMonitor
                     break;
                 case 4:
                     SQLiteDataReader localResult = localDB.GetCurrentAssetStats();
-                    
+
                     //TODO write good live DB query 
                     //SqlDataReader liveResults = liveDB.GetUserDataWithParty();
                     break;
             }
-            fillDataGrid(selectedCommand);
+
+            fillDataGrid(SQLiteDataResult, selectedCommand);
         }
 
-        private void fillDataGrid(int selectedIndexFromDropdown)
+        private void fillDataGrid(SQLiteDataReader fetchedValues, int selectedCommandIndex)
         {
             loginstats.Clear();
-            conn.Open();
-            if (cmd.CommandText != null)
             {
-                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                using (SQLiteDataReader reader = fetchedValues)
                 {
                     while (reader.Read())
                     {
-                        if (selectedIndexFromDropdown == 4)
-                        {
-                            using (SqlDataReader sqlReader = liveCmd.ExecuteReader())
-                            {
-
-                            }
-
-                            liveCmd.Parameters.AddWithValue("@assetId", (string)reader["werkplekid"]);
-                        }
                         loginstats.Add(new Loginstat(Convert.ToDateTime((string)reader["datum"]), (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
-
                     }
                 }
                 loginstatDataGrid.DataSource = loginstats;
+                if (assetValidityCheck.Checked) ValidateAssets();
                 loginstatDataGrid.Refresh();
                 validateFilterBoxesEnabled();
             }
-            conn.Close();
+            localDB._sqlConnection.Close();
+            liveDB._sqlConnection.Close();
+        }
+
+        private void ValidateAssets()
+        {
+            foreach (DataGridViewRow row in loginstatDataGrid.Rows)
+            {
+                var assetId = row.Cells[4].ToString();
+                var assetvalidity = liveDB.GetDataValidity(row.Cells[4].Value.ToString());
+                var test = string.Empty;
+                switch (assetvalidity)
+                {
+                    case 0:
+                        row.DefaultCellStyle.BackColor = Color.Red;
+                        break;
+                    case 1:
+                        row.DefaultCellStyle.BackColor = Color.Orange;
+                        break;
+                    case 2:
+                        row.DefaultCellStyle.BackColor = Color.Green;
+                        break;
+                }
+            }
         }
 
         #region check for enabled objects

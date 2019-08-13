@@ -21,12 +21,6 @@ namespace AssetMonitor
         //The local user that had most recently used the asset
         private string _localUser;
 
-        //The sqlCommand that will be executed is already initialised.
-        private SqlCommand _liveCmd;
-        private SqlConnection _liveConn;
-        private bool isInDB = false;
-
-        private LocalDB _localDB;
         private LiveDB _liveDB;
 
         public AssetData(string connString, string assetId, string localUser)
@@ -34,10 +28,9 @@ namespace AssetMonitor
             InitializeComponent();
             _localUser = localUser;
             _assetId = assetId;
-            _liveDB = new LiveDB(connString);
-            _liveCmd = new SqlCommand("", _liveConn);
+            _liveDB = new LiveDB(new SqlConnection(connString));
             SetFormValues();
-            initializeAssetData();
+            InitializeAssetData();
         }
 
         //Sets title and name of the groupbox to the assetId
@@ -47,114 +40,85 @@ namespace AssetMonitor
             groupBox1.Text += "  " + _assetId;
         }
 
-        private void initializeAssetData()
+
+
+        private void DisplayDataValidity(int dataValidity)
         {
-            LiveDB liveDB = new LiveDB(_liveConn);
-            _liveConn.Open();
-            _liveCmd = new SqlCommand(getCommandTextWithParty(_assetId), _liveConn);
-            using (SqlDataReader reader = _liveCmd.ExecuteReader())
+            switch (dataValidity)
             {
-                if (reader.Read())
-                {
-                    FillAssetDataFields(reader, true);
+                case 0:
+                    textBoxAssetNotFound.Visible = true;
+                    break;
+                case 1:
+                    textBoxAssetNotFound.Text = "Asset not bound to user in clientele";
+                    textBoxAssetNotFound.ForeColor = Color.Orange;
+                    textBoxAssetNotFound.Visible = true;
+                    break;
+                case 2:
                     textBoxAssetNotFound.Text = "All data is valid";
                     textBoxAssetNotFound.ForeColor = Color.MediumSeaGreen;
                     textBoxAssetNotFound.Visible = true;
-                }
-            }
-            if (isInDB == false)
-            {
-                _liveCmd = new SqlCommand(getCommandTextWithoutParty(_assetId), _liveConn);
-                using (SqlDataReader reader = _liveCmd.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        FillAssetDataFields(reader, false);
-                        textBoxAssetNotFound.Text = "Asset not bound to user in clientele";
-                        textBoxAssetNotFound.ForeColor = Color.Orange;
-                        textBoxAssetNotFound.Visible = true;
-                    }
-                }
-            }
-            _liveConn.Close();
-            if (!isInDB)
-            {
-                textBoxAssetNotFound.Visible = true;
-            }
-        }
-
-        private void FillAssetDataFields(SqlDataReader reader, bool isParty)
-        {
-            //TODO make fields be filled in dynamically
-            assetStatusTextBox.Text = (reader["Entry"] == DBNull.Value) ? "No asset status found" : (string)reader["Entry"];
-            assetDescriptionTextBox.Text = (reader["Description"] == DBNull.Value) ? "No description found" : (string)reader["Description"];
-            serialNumberTextBox.Text = (reader["SerialNumber"] == DBNull.Value) ? "No serial number found" : (string)reader["SerialNumber"];
-            assetNumberTextBox.Text = (reader["AssetNumber"] == DBNull.Value) ? "No asset number found" : (string)reader["AssetNumber"];
-            if (isParty)
-            {
-                commentsTextBox.Text = (reader["Comments"] == DBNull.Value) ? "No comments available" : (string)reader["Comments"];
-                userStatusTextBox.Text = (reader["Alert"] == DBNull.Value) ? "Active" : (string)reader["Alert"];
-                personnelNumberTextBox.Text = (reader["PersonnelNumber"] == DBNull.Value) ? "No personnel number" : (string)reader["PersonnelNumber"];
-                assetUserTextBox.Text = (reader["fullName"] == DBNull.Value) ? "No user found" : (string)reader["fullName"];
-                if ((string)reader["Username"] != _localUser)
-                {
+                    break;
+                case 3:
+                    textBoxAssetNotFound.ForeColor = Color.Orange;
                     textBoxAssetNotFound.Text = "Users do not match in Clientele and Local DB";
                     textBoxAssetNotFound.Show();
-                }
-                isInDB = true;
+                    break;
             }
-            else
+
+        }
+
+        private void InitializeAssetData()
+        {
+            DataTable datatable = null;
+            switch (_liveDB.GetDataValidity(_assetId))
             {
-                commentsTextBox.Text = (reader["Notes"] == DBNull.Value) ? "No notes available" : (string)reader["Notes"];
+                case 0:
+                    DisplayDataValidity(0);
+                    break;
+                case 1:
+                    DisplayDataValidity(1);
+                    datatable = _liveDB.GetUserData(false, _assetId);
+                    FillAssetDataFields(datatable, 1);
+                    break;
+                case 2:
+                    DisplayDataValidity(2);
+                    datatable = _liveDB.GetUserData(true, _assetId);
+                    FillAssetDataFields(datatable, 2);
+                    break;
+
             }
+        }
+
+
+        private void FillAssetDataFields(DataTable datatable, int assetvalidity)
+        {
+            DataRow row = datatable.Rows[0];
             localUserTextBox.Text = _localUser;
+            switch (assetvalidity)
+            {
+                case 1:
+                    assetStatusTextBox.Text = (row["Entry"] == DBNull.Value) ? "No asset status found" : (string)row["Entry"];
+                    assetDescriptionTextBox.Text = (row["Description"] == DBNull.Value) ? "No description found" : (string)row["Description"];
+                    serialNumberTextBox.Text = (row["SerialNumber"] == DBNull.Value) ? "No serial number found" : (string)row["SerialNumber"];
+                    assetNumberTextBox.Text = (row["AssetNumber"] == DBNull.Value) ? "No asset number found" : (string)row["AssetNumber"];
+                    commentsTextBox.Text = (row["Notes"] == DBNull.Value) ? "No notes available" : (string)row["Notes"];
+                    break;
+                case 2:
+                    commentsTextBox.Text = (row["Comments"] == DBNull.Value) ? "No comments available" : (string)row["Comments"];
+                    userStatusTextBox.Text = (row["Alert"] == DBNull.Value) ? "Active" : (string)row["Alert"];
+                    personnelNumberTextBox.Text = (row["PersonnelNumber"] == DBNull.Value) ? "No personnel number" : (string)row["PersonnelNumber"];
+                    assetUserTextBox.Text = (row["fullName"] == DBNull.Value) ? "No user found" : (string)row["fullName"];
+                    if ((string)row["Username"] != _localUser)
+                    {
+                        DisplayDataValidity(3);
+                    }
+                    //Call recursive to fill in the non-party related fields
+                    FillAssetDataFields(_liveDB.GetUserData(false, _assetId),  assetvalidity);
+                    break;
+            }
         }
 
-
-
-        /// <summary>
-        /// Returns the command text for the clientele database query
-        /// </summary>
-        /// <param name="assetId"></param>
-        /// <returns></returns>
-        private string getCommandTextWithParty(string assetId)
-        {
-            return @"SELECT a.username, 
-                   a.alert, 
-                   a.personnelnumber, 
-                   a.fullname, 
-                   a.active, 
-                   a.comments, 
-                   c.assetnumber, 
-                   c.description, 
-                   c.serialnumber, 
-                   d.entry 
-            FROM   person A, 
-                   party B, 
-                   product C, 
-                   valuelistentry D 
-            WHERE  b.personid = a.personid 
-            AND    c.partyid = b.partyid 
-            AND    c.productstatusid = d.valuelistentryid 
-            AND    c.assetnumber = '" + assetId + "'";
-        }
-        /// <summary>
-        /// Returns the command text for the clientele database query when there is no peson matched to the asset
-        /// </summary>
-        /// <param name="assetId"></param>
-        /// <returns></returns>
-        private string getCommandTextWithoutParty(string assetId)
-        {
-            return @"SELECT c.description, 
-                    c.serialNumber, 
-                    c.assetNumber, 
-                    c.notes,
-                    d.entry
-            FROM    product c, 
-                    valuelistentry D
-            WHERE   c.assetnumber = '" + assetId + "' " +
-            "AND    c.productstatusid = d.valuelistentryid";
-        }
         /// <summary>
         /// Closes the form
         /// </summary>

@@ -7,17 +7,18 @@ namespace AssetMonitor.Databases
     {
 
 
-        private SQLiteCommand _sqlCommand;
-        private SQLiteConnection _sqlConnection;
+        public SQLiteCommand _sqlCommand;
+        public SQLiteConnection _sqlConnection;
 
         //Static readonly variables used for sql query formatting
         static readonly string FORMATTED_DATE = " DATE(substr(datum,7,4)||'-'||substr(datum,4,2)||'-'||substr(datum,1,2))";
         static readonly string DATUM_ORDER_DESC = String.Format(" ORDER BY {0} DESC", FORMATTED_DATE);
 
 
-        public LocalDB(string connectionString)
+        public LocalDB(SQLiteConnection localConnection)
         {
-            _sqlConnection = new SQLiteConnection(connectionString);
+            _sqlConnection = localConnection;
+            _sqlCommand = new SQLiteCommand("", _sqlConnection);
         }
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace AssetMonitor.Databases
         public SQLiteDataReader GetCurrentAssetStats()
         {
             _sqlCommand = new SQLiteCommand(String.Format("select *, MAX({0}) FROM loginstats GROUP BY werkplekid {1}", FORMATTED_DATE, DATUM_ORDER_DESC));
-            _sqlConnection.Open();
+            _sqlCommand.Connection = _sqlConnection;
             return _sqlCommand.ExecuteReader();
         }
 
@@ -39,7 +40,6 @@ namespace AssetMonitor.Databases
         public SQLiteDataReader GetAssetStatsByName(string nameToFilter)
         {
             _sqlCommand = new SQLiteCommand(String.Format(@"select * from loginstats where werkplekid LIKE '%{0}%' {1}", nameToFilter, DATUM_ORDER_DESC));
-            _sqlConnection.Open();
             return _sqlCommand.ExecuteReader();
         }
 
@@ -51,7 +51,7 @@ namespace AssetMonitor.Databases
         public SQLiteDataReader GetAssetDataBetweenDatesLesser(string filterDate)
         {
             _sqlCommand = new SQLiteCommand(String.Format(@"SELECT * FROM loginstats WHERE {0} <= '{1}' {2}", FORMATTED_DATE, filterDate, DATUM_ORDER_DESC));
-            _sqlConnection.Open();
+
             return _sqlCommand.ExecuteReader();
         }
 
@@ -63,7 +63,6 @@ namespace AssetMonitor.Databases
         public SQLiteDataReader GetAssetDataBetweenDatesGreater(string filterDate)
         {
             _sqlCommand = new SQLiteCommand(String.Format(@"SELECT * FROM loginstats WHERE {0} >= '{1}' {2}", FORMATTED_DATE, filterDate, DATUM_ORDER_DESC));
-            _sqlConnection.Open();
             return _sqlCommand.ExecuteReader();
         }
 

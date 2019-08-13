@@ -1,23 +1,27 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace AssetMonitor.Databases
 {
     class LiveDB
     {
 
-        private SqlCommand _sqlCommand;
-        private SqlConnection _sqlConnection;
+        public SqlCommand _sqlCommand;
+        public SqlConnection _sqlConnection;
 
-
-        public LiveDB(string connectionString)
+        public LiveDB(SqlConnection sqlConnection)
         {
-            _sqlConnection = new SqlConnection(connectionString);
+            _sqlConnection = sqlConnection;
+            _sqlCommand = new SqlCommand("", _sqlConnection);
         }
 
-
-        public SqlDataReader GetUserDataWithParty(string assetId)
+        public DataTable GetUserData(bool withParty, string assetId)
         {
-            _sqlCommand = new SqlCommand(
+            DataTable result = null;
+            if (withParty)
+            {
+                result = GetDataTableFromCommand(string.Format(
                 @"SELECT a.username, 
                    a.alert, 
                    a.personnelnumber, 
@@ -35,26 +39,59 @@ namespace AssetMonitor.Databases
             WHERE  b.personid = a.personid 
             AND    c.partyid = b.partyid 
             AND    c.productstatusid = d.valuelistentryid 
-            AND    c.assetnumber = '" + assetId + "'", _sqlConnection);
-
-            return _sqlCommand.ExecuteReader();
-        }
-
-
-        public SqlDataReader GetUserDataWithoutParty(string assetId)
-        {
-            _sqlCommand = new SqlCommand(
-                @"SELECT c.description, 
+            AND    c.assetnumber = '{0}'", assetId));
+            }
+            else
+            {
+                result = GetDataTableFromCommand(string.Format(@"SELECT c.description, 
                     c.serialNumber, 
                     c.assetNumber, 
                     c.notes,
                     d.entry
             FROM    product c, 
                     valuelistentry D
-            WHERE   c.assetnumber = '" + assetId + "' " +
-            "AND    c.productstatusid = d.valuelistentryid", _sqlConnection);
+            WHERE   c.assetnumber = '{0}' " +
+            "AND    c.productstatusid = d.valuelistentryid", assetId));
+            }
+            return result;
+        }
 
-            return _sqlCommand.ExecuteReader();
+        public DataTable GetDataTableFromCommand(string sqlCommand)
+        {
+            _sqlConnection.Open();
+            var dataTable = new DataTable();
+            _sqlCommand.CommandText = sqlCommand;
+            var result = _sqlCommand.ExecuteReader();
+            dataTable.Load(result);
+            _sqlConnection.Close();
+            return dataTable;
+        }
+
+
+        public int GetDataValidity(string assetId)
+        {
+            _sqlConnection.Open();
+            _sqlCommand.CommandText = string.Format(
+            @"SELECT(SELECT COUNT(*)
+            FROM    person A, 
+                    party B, 
+                    product C, 
+                    valuelistentry D 
+            WHERE   b.personid = a.personid 
+            AND     c.partyid = b.partyid 
+            AND     c.productstatusid = d.valuelistentryid 
+            AND     c.assetnumber = '{0}')
+            +
+            (SELECT COUNT(*)
+            FROM    product c, 
+                    valuelistentry D
+            WHERE   c.assetnumber = '{1}' 
+            AND     c.productstatusid = d.valuelistentryid) as sum", assetId, assetId);
+            var reader = _sqlCommand.ExecuteReader();
+            reader.Read();
+            int result = Convert.ToInt32(reader[0]);
+            _sqlConnection.Close();
+            return result;
         }
 
     }

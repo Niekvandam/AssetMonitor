@@ -50,6 +50,7 @@
             this.dataSettingsGroupBox = new System.Windows.Forms.GroupBox();
             this.dateFilteringGroupBox = new System.Windows.Forms.GroupBox();
             this.dataGridGroupBox = new System.Windows.Forms.GroupBox();
+            this.assetValidityCheck = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.loginstatDataGrid)).BeginInit();
             this.settingsGroupBox.SuspendLayout();
             this.dataSettingsGroupBox.SuspendLayout();
@@ -243,6 +244,7 @@
             // 
             // dataSettingsGroupBox
             // 
+            this.dataSettingsGroupBox.Controls.Add(this.assetValidityCheck);
             this.dataSettingsGroupBox.Controls.Add(this.databaseFileSelectButton);
             this.dataSettingsGroupBox.Controls.Add(this.dbLocationTextBox);
             this.dataSettingsGroupBox.Controls.Add(this.label2);
@@ -286,6 +288,16 @@
             this.dataGridGroupBox.Size = new System.Drawing.Size(584, 345);
             this.dataGridGroupBox.TabIndex = 19;
             this.dataGridGroupBox.TabStop = false;
+            // 
+            // assetValidityCheck
+            // 
+            this.assetValidityCheck.AutoSize = true;
+            this.assetValidityCheck.Location = new System.Drawing.Point(6, 59);
+            this.assetValidityCheck.Name = "assetValidityCheck";
+            this.assetValidityCheck.Size = new System.Drawing.Size(177, 17);
+            this.assetValidityCheck.TabIndex = 9;
+            this.assetValidityCheck.Text = "Immediately check asset validity";
+            this.assetValidityCheck.UseVisualStyleBackColor = true;
             // 
             // AssetMonitor
             // 
@@ -332,6 +344,7 @@
         private System.Windows.Forms.GroupBox dateFilteringGroupBox;
         private System.Windows.Forms.GroupBox dataSettingsGroupBox;
         private System.Windows.Forms.GroupBox dataGridGroupBox;
+        private System.Windows.Forms.CheckBox assetValidityCheck;
     }
 }
 
