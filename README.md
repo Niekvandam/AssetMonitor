@@ -13,19 +13,16 @@ When running a query, the result will end up in a datagrid, in which you can cli
 This tool is mostly just plug and play, but you do require one important file which I did not include in the repo. This file is called the settings.SECRET.xml. This xml file contains database credentials and the location of the .db file. 
 These fields are all required in order to use this tool as intended.
 
-I am planning on adding an example file to the repository, but did not have time to do so yet. So for now, when cloning the repo you need to manually create the file named settings.SECRET.xml. The file should look as follows:
-```xml
-<DB>
-  <LiveDB>
-    <live_server_name> </live_server_name>
-    <live_server_db> </live_server_db>
-    <live_server_user> </live_server_user>
-    <live_server_pass> </live_server_pass>
-  </LiveDB>
-  <LocalDB>
-    <local_db_path> </local_db_path>
-  <LocalDB>
-</DB>
+I am planning on adding an example file to the repository, but did not have time to do so yet. So for now, when cloning the repo you need to manually create the file named settings.SECRET.ini. The file should look as follows:
+```ini
+[LiveDB]
+servername=
+dbname=
+username=
+password=
+
+[LocalDB]
+localpath=
 ```
-I think it should speak for itself to whether which xml node should contain what.
+It should speak for itself which value should be appointed to each variable
 
