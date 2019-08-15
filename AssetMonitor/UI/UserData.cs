@@ -70,7 +70,7 @@ namespace AssetMonitor
             {
                 while (reader.Read())
                 {
-                    _loginstats.Add(new Loginstat(Convert.ToDateTime((string)reader["datum"]), (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
+                    _loginstats.Add(new Loginstat(Convert.ToDateTime((string)reader["datum"]), (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"], "No live data found"));
                 }
             }
             userDataGrid.DataSource = _loginstats;

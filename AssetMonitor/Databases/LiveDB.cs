@@ -94,5 +94,26 @@ namespace AssetMonitor.Databases
             return result;
         }
 
+
+        public DataTable GetThinClients()
+        {
+            DataTable result = new DataTable();
+            _sqlConnection.Open();
+            _sqlCommand.CommandText = string.Format(
+            @" SELECT TOP 1000
+                    [AssetNumber],
+                    [Description],
+                    [Active],
+            FROM    [ClienteleITSM_Prod_Application].[dbo].[Product]
+            WHERE   Active = 1 
+            AND     ItemID in ( 
+            SELECT  ItemID   
+            FROM    [ClienteleITSM_Prod_Application].[dbo].[Items]
+            WHERE   Description like '%thin%')");
+            var reader = _sqlCommand.ExecuteReader();
+            result.Load(reader);
+            _sqlConnection.Close();
+            return result;
+        }
     }
 }

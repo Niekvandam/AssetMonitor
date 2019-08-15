@@ -13,15 +13,17 @@ namespace AssetMonitor
         public string Server {get;set;}
         public string LoginId {get;set;}
         public string AssetId {get;set;}
+        public string Validity { get; set; }
 
 
-        public Loginstat(DateTime loginDate, string loginTime, string server, string loginId, string assetId)
+        public Loginstat(DateTime loginDate, string loginTime, string server, string loginId, string assetId, string validity)
         {
             LoginDate = loginDate;
             LoginTime = loginTime;
             LoginId = loginId;
             Server = server;
             AssetId = assetId;
+            Validity = validity;
         }
     }
 }

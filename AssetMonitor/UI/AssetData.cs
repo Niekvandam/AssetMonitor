@@ -105,7 +105,6 @@ namespace AssetMonitor
                     commentsTextBox.Text = (row["Notes"] == DBNull.Value) ? "No notes available" : (string)row["Notes"];
                     break;
                 case 2:
-                    commentsTextBox.Text = (row["Comments"] == DBNull.Value) ? "No comments available" : (string)row["Comments"];
                     userStatusTextBox.Text = (row["Alert"] == DBNull.Value) ? "Active" : (string)row["Alert"];
                     personnelNumberTextBox.Text = (row["PersonnelNumber"] == DBNull.Value) ? "No personnel number" : (string)row["PersonnelNumber"];
                     assetUserTextBox.Text = (row["fullName"] == DBNull.Value) ? "No user found" : (string)row["fullName"];
@@ -113,8 +112,12 @@ namespace AssetMonitor
                     {
                         DisplayDataValidity(3);
                     }
+                    if (row["comments"] != null)
+                    {
+                        commentsTextBox.Text = (row["comments"] == DBNull.Value) ? "No comments available" : (string)row["comments"];
+                    }
                     //Call recursive to fill in the non-party related fields
-                    FillAssetDataFields(_liveDB.GetUserData(false, _assetId),  assetvalidity);
+                    FillAssetDataFields(_liveDB.GetUserData(false, _assetId), assetvalidity);
                     break;
             }
         }

@@ -9,6 +9,8 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Security;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using AssetMonitor.Databases;
@@ -29,11 +31,11 @@ namespace AssetMonitor
         private string _password = string.Empty;
         private string _server = string.Empty;
         private string _database = string.Empty;
-        private string _databaseLocation;
+        private string _databaseLocation = string.Empty;
+        private string _databaseLocationPorthos = string.Empty;
         private SQLiteConnection conn;
         private SQLiteCommand cmd;
-        private SqlConnection liveConn;
-        private SqlCommand liveCmd;
+
 
         private string _liveDBConnString;
 
@@ -88,6 +90,7 @@ namespace AssetMonitor
                     }
                 }
             }
+
         }
 
         /// <summary
@@ -96,8 +99,8 @@ namespace AssetMonitor
         private void CreateLiveConnection()
         {
             _liveDBConnString = String.Format(@"Server={0};Database={1};User Id={2};Password={3}", _server, _database, _username, _password);
-            liveConn = new SqlConnection(_liveDBConnString);
-            liveCmd = new SqlCommand("", liveConn);
+            liveDB = new LiveDB(new SqlConnection(_liveDBConnString));
+
         }
 
         /// <summary>
@@ -105,11 +108,14 @@ namespace AssetMonitor
         /// </summary>
         private void CreateLocalConnection()
         {
-            if (_databaseLocation != null)
+            if (_databaseLocation != string.Empty)
             {
                 conn = new SQLiteConnection("data source=" + _databaseLocation);
                 cmd = new SQLiteCommand(conn);
                 dbLocationTextBox.Text = _databaseLocation;
+                localDB = new LocalDB(new SQLiteConnection(@"data source=" + _databaseLocation));
+                var dbloc = new FileInfo(_databaseLocation).Directory.FullName;
+                _databaseLocationPorthos = Path.Combine(($@"data source={dbloc}\\auditPorthos.db"));
             }
         }
 
@@ -121,22 +127,7 @@ namespace AssetMonitor
         /// <param name="e"></param>
         private void DatabaseFileSelectButton_Click(object sender, EventArgs e)
         {
-            openFileDialog1.Title = "Please select a Data Base file";
-            openFileDialog1.Filter = "Data Base files(*.db)|*.db";
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    _databaseLocation = openFileDialog1.FileName;
-                    dbLocationTextBox.Text = _databaseLocation;
-                    CreateLocalConnection();
-                }
-                catch (SecurityException ex)
-                {
-                    MessageBox.Show($"Security error. \n\n Error message: {ex.Message} \n\n" +
-                        $"Details: \n\n{ex.StackTrace}");
-                }
-            }
+            OpenDbFileDialog();
             validateCheckAssetsButtonEnabled();
         }
 
@@ -147,85 +138,110 @@ namespace AssetMonitor
         /// <param name="e"></param>
         private void CheckAssetsButton_Click(object sender, EventArgs e)
         {
-            localDB = new LocalDB(new SQLiteConnection(@"data source=" + _databaseLocation));
-            liveDB = new LiveDB(new SqlConnection(String.Format(@"Server={0};Database={1};User Id={2};Password={3}", _server, _database, _username, _password)));
-            SQLiteDataReader SQLiteDataResult = null;
+            DataTable result = null;
             localDB._sqlConnection.Open();
 
 
             string filterDate = filterDatePicker.Value.ToString("yyyy-MM-dd");
             int selectedCommand = commandListComboBox.SelectedIndex;
+
+            result = GetLocalAssetData(selectedCommand, filterDate);
+
+            fillDataGrid(result, selectedCommand);
+            if (assetValidityCheck.Checked)
+            {
+                checkAssetsButton.Enabled = false;
+                Thread assetValidationThread = new Thread(ValidateAssets);
+                assetValidationThread.Start();
+                checkAssetsButton.Enabled = true;
+            }
+            exportToEmailButton.Enabled = true;
+        }
+
+        private DataTable GetLocalAssetData(int selectedCommand, string filterDate = null)
+        {
+            DataTable result = null;
             switch (selectedCommand)
             {
                 case 0:
-                    SQLiteDataResult = localDB.GetCurrentAssetStats();
+                    result = localDB.GetCurrentAssetStats();
                     break;
                 case 1:
-                    SQLiteDataResult = localDB.GetAssetStatsByName(assetNumberTextBox.Text);
+                    result = localDB.GetAssetStatsByName(assetNumberTextBox.Text);
                     break;
                 case 2:
-                    throw new NotImplementedException();
+                    var dataTable = new DataTable();
+                    dataTable.Columns.Add("AssetNumber");
+                    dataTable.Columns.Add("Last Login");
+                    dataTable.Columns.Add("Last User");
+                    dataTable.Columns.Add("Description");
+                    dataTable.Columns.Add("Status");
+                    var porthosLocalDB = new LocalDB(new SQLiteConnection(_databaseLocationPorthos));
+                    var porthosAssets = porthosLocalDB.GetCurrentAssetStats();
+                    var veereAssets = localDB.GetCurrentAssetStats();
+                    var clienteleAssets = liveDB.GetThinClients();
+                    veereAssets.Merge(porthosAssets);
+                    foreach (DataGridViewRow rows in clienteleAssets.Rows)
+                    {
+                        foreach (DataGridViewRow localRows in veereAssets.Rows)
+                        {
+                            if (rows.Cells[0].Value.ToString() == localRows.Cells[4].Value.ToString())
+                            {
+                                var time = TimeSpan.Parse(localRows.Cells[0].Value.ToString());
+                                var date = DateTime.Parse(localRows.Cells[1].Value.ToString());
+                                DateTime loginTime = date + time;
+                                var lastLogin = localRows.Cells[0];
+                                dataTable.Rows.Add(rows.Cells[0].Value.ToString(), loginTime, localRows.Cells[2].Value.ToString(), rows.Cells[1].Value.ToString(), rows.Cells[2].Value.ToString());
+                                break;
+                            }
+                        }
+                        continue;
+                    }
+                    break;
                 case 3:
                     if (beforeRadioButton.Checked || afterRadioButton.Checked)
                     {
                         if (afterRadioButton.Checked)
                         {
-                            SQLiteDataResult = localDB.GetAssetDataBetweenDatesGreater(filterDate);
+                            result = localDB.GetAssetDataBetweenDatesGreater(filterDate);
                         }
                         else
                         {
-                            SQLiteDataResult = localDB.GetAssetDataBetweenDatesLesser(filterDate);
+                            result = localDB.GetAssetDataBetweenDatesLesser(filterDate);
                         }
                     }
                     break;
-                case 4:
-                    SQLiteDataReader localResult = localDB.GetCurrentAssetStats();
-
-                    //TODO write good live DB query 
-                    //SqlDataReader liveResults = liveDB.GetUserDataWithParty();
-                    break;
             }
-
-            fillDataGrid(SQLiteDataResult, selectedCommand);
+            return result;
         }
 
-        private void fillDataGrid(SQLiteDataReader fetchedValues, int selectedCommandIndex)
+        private void fillDataGrid(DataTable fetchedValues, int selectedCommandIndex)
         {
-            loginstats.Clear();
-            {
-                using (SQLiteDataReader reader = fetchedValues)
-                {
-                    while (reader.Read())
-                    {
-                        loginstats.Add(new Loginstat(Convert.ToDateTime((string)reader["datum"]), (string)reader["tijd"], (string)reader["server"], (string)reader["loginid"], (string)reader["werkplekid"]));
-                    }
-                }
-                loginstatDataGrid.DataSource = loginstats;
-                if (assetValidityCheck.Checked) ValidateAssets();
-                loginstatDataGrid.Refresh();
-                validateFilterBoxesEnabled();
-            }
+            loginstatDataGrid.DataSource = fetchedValues;
+            loginstatDataGrid.Refresh();
+            validateFilterBoxesEnabled();
             localDB._sqlConnection.Close();
-            liveDB._sqlConnection.Close();
         }
 
         private void ValidateAssets()
         {
+            DataGridViewTextBoxCell cell = new DataGridViewTextBoxCell();
             foreach (DataGridViewRow row in loginstatDataGrid.Rows)
             {
                 var assetId = row.Cells[4].ToString();
                 var assetvalidity = liveDB.GetDataValidity(row.Cells[4].Value.ToString());
-                var test = string.Empty;
                 switch (assetvalidity)
                 {
-                    case 0:
-                        row.DefaultCellStyle.BackColor = Color.Red;
-                        break;
                     case 1:
+                        row.Cells[5].Value = "Conflicting data found";
                         row.DefaultCellStyle.BackColor = Color.Orange;
                         break;
                     case 2:
-                        row.DefaultCellStyle.BackColor = Color.Green;
+                        row.DefaultCellStyle.BackColor = Color.SeaGreen;
+                        row.Cells[5].Value = "Correct data found";
+                        break;
+                    default:
+                        row.DefaultCellStyle.BackColor = Color.Red;
                         break;
                 }
             }
@@ -253,7 +269,7 @@ namespace AssetMonitor
         /// </summary>
         public void validateFilterBoxesEnabled()
         {
-            if (loginstats.Count != 0)
+            if (loginstatDataGrid.Rows.Count != 0)
             {
                 assetIdTextBox.Enabled = true;
                 loginIdTextBox.Enabled = true;
@@ -274,7 +290,8 @@ namespace AssetMonitor
         {
             if (commandListComboBox.SelectedIndex == 1)
             {
-                assetNumberTextBox.Enabled = true;
+                assetNumberGroupBox.Enabled = true;
+
             }
             else if (commandListComboBox.SelectedIndex == 3)
             {
@@ -283,7 +300,7 @@ namespace AssetMonitor
             else
             {
                 dateFilteringGroupBox.Enabled = false;
-                assetNumberTextBox.Enabled = false;
+                assetNumberGroupBox.Enabled = false;
             }
             validateCheckAssetsButtonEnabled();
         }
@@ -299,13 +316,12 @@ namespace AssetMonitor
         /// <param name="e"></param>
         private void LoginIdTextBox_TextChanged(object sender, EventArgs e)
         {
-            var filteredStats = new List<Loginstat>();
-            foreach (Loginstat stat in loginstats)
+            foreach (DataGridViewRow row in loginstatDataGrid.Rows)
             {
-                if (stat.LoginId.Contains(loginIdTextBox.Text))
-                    filteredStats.Add(stat);
+                if (!row.Cells[3].Value.ToString().Contains(loginIdTextBox.Text))
+                {
+                }
             }
-            loginstatDataGrid.DataSource = filteredStats;
         }
 
         /// <summary>
@@ -315,36 +331,71 @@ namespace AssetMonitor
         /// <param name="e"></param>
         private void AssetIdTextBox_TextChanged(object sender, EventArgs e)
         {
-            var filteredStats = new List<Loginstat>();
-            foreach (Loginstat stat in loginstats)
+            foreach (DataGridViewRow row in loginstatDataGrid.Rows)
             {
-                if (stat.AssetId.ToLower().Contains(assetIdTextBox.Text.ToLower()))
-                    filteredStats.Add(stat);
+                if (!row.Cells[4].Value.ToString().Contains(assetIdTextBox.Text))
+                {
+                }
             }
-            loginstatDataGrid.DataSource = filteredStats;
         }
 
         #endregion
 
+
+        private void OpenDbFileDialog()
+        {
+            openFileDialog1.Title = "Please select a Data Base file";
+            openFileDialog1.Filter = "Data Base files(*.db)|*.db";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    _databaseLocation = openFileDialog1.FileName;
+                    dbLocationTextBox.Text = _databaseLocation;
+                    CreateLocalConnection();
+                }
+                catch (SecurityException ex)
+                {
+                    MessageBox.Show($"Security error. \n\n Error message: {ex.Message} \n\n" +
+                        $"Details: \n\n{ex.StackTrace}");
+                }
+            }
+        }
+
+
         private void LoginstatDataGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            var userId = loginstatDataGrid.Rows[e.RowIndex].Cells[3].Value.ToString();
+            if (e.RowIndex != 0)
+            {
+                var userId = loginstatDataGrid.Rows[e.RowIndex].Cells[3].Value.ToString();
 
-            if (e.ColumnIndex == 0)
-            {
-                return;
+                if (e.ColumnIndex == 0)
+                {
+                    return;
+                }
+                if (e.ColumnIndex == 3)
+                {
+                    userDataForm = new UserData(conn, userId);
+                    userDataForm.Show();
+                }
+                else if (e.ColumnIndex == 4)
+                {
+                    var assetId = loginstatDataGrid.Rows[e.RowIndex].Cells[4].Value.ToString();
+                    assetDataForm = new AssetData(_liveDBConnString, assetId, userId);
+                    assetDataForm.Show();
+                }
             }
-            if (e.ColumnIndex == 3)
-            {
-                userDataForm = new UserData(conn, userId);
-                userDataForm.Show();
-            }
-            else if (e.ColumnIndex == 4)
-            {
-                var assetId = loginstatDataGrid.Rows[e.RowIndex].Cells[4].Value.ToString();
-                assetDataForm = new AssetData(_liveDBConnString, assetId, userId);
-                assetDataForm.Show();
-            }
+
+        }
+
+        private void AssetIdTextBox_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Warning! \n Using this filter will currently erease the colour scheme!", "Warning!");
+        }
+
+        private void LoginIdTextBox_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Warning! \n Using this filter will currently erease the colour scheme!", "Warning!");
         }
     }
 }
