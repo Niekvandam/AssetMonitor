@@ -103,12 +103,12 @@ namespace AssetMonitor.Databases
             @" SELECT TOP 1000
                     [AssetNumber],
                     [Description],
-                    [Active],
+                    [Active]
             FROM    [ClienteleITSM_Prod_Application].[dbo].[Product]
             WHERE   Active = 1 
             AND     ItemID in ( 
             SELECT  ItemID   
-            FROM    [ClienteleITSM_Prod_Application].[dbo].[Items]
+            FROM    Items
             WHERE   Description like '%thin%')");
             var reader = _sqlCommand.ExecuteReader();
             result.Load(reader);

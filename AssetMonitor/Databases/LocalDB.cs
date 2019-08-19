@@ -83,7 +83,6 @@ namespace AssetMonitor.Databases
         {
             DataTable dataTable = new DataTable();
             PrepareDataTableForLocal(dataTable);
-
             using (SQLiteDataReader reader = fetchedValues)
             {
                 while (reader.Read())

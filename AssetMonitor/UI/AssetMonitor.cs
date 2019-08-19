@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Threading;
@@ -139,15 +140,13 @@ namespace AssetMonitor
         private void CheckAssetsButton_Click(object sender, EventArgs e)
         {
             DataTable result = null;
-            localDB._sqlConnection.Open();
-
 
             string filterDate = filterDatePicker.Value.ToString("yyyy-MM-dd");
             int selectedCommand = commandListComboBox.SelectedIndex;
 
             result = GetLocalAssetData(selectedCommand, filterDate);
 
-            fillDataGrid(result, selectedCommand);
+            fillDataGrid(result);
             if (assetValidityCheck.Checked)
             {
                 checkAssetsButton.Enabled = false;
@@ -181,22 +180,20 @@ namespace AssetMonitor
                     var veereAssets = localDB.GetCurrentAssetStats();
                     var clienteleAssets = liveDB.GetThinClients();
                     veereAssets.Merge(porthosAssets);
-                    foreach (DataGridViewRow rows in clienteleAssets.Rows)
+                    foreach (DataRow row in clienteleAssets.Rows)
                     {
-                        foreach (DataGridViewRow localRows in veereAssets.Rows)
+                        List<DataRow> localRows = (from x in veereAssets.AsEnumerable() where x.Field<string>(0) == row.Field<string>(0) select x).ToList();
+                        if (localRows.Count <= 0) continue;
+                        foreach (DataRow localRow in localRows)
                         {
-                            if (rows.Cells[0].Value.ToString() == localRows.Cells[4].Value.ToString())
-                            {
-                                var time = TimeSpan.Parse(localRows.Cells[0].Value.ToString());
-                                var date = DateTime.Parse(localRows.Cells[1].Value.ToString());
-                                DateTime loginTime = date + time;
-                                var lastLogin = localRows.Cells[0];
-                                dataTable.Rows.Add(rows.Cells[0].Value.ToString(), loginTime, localRows.Cells[2].Value.ToString(), rows.Cells[1].Value.ToString(), rows.Cells[2].Value.ToString());
-                                break;
-                            }
+
+                            var time = TimeSpan.Parse(localRow.Field<string>(0).ToString());
+                            var date = DateTime.Parse(localRow.Field<string>(1).ToString());
+                            DateTime loginTime = date + time;
+                            dataTable.Rows.Add(row.Field<string>(0).ToString(), loginTime, localRow.Field<string>(2).ToString(), row.Field<string>(1).ToString(), row.Field<bool>(2).ToString());
                         }
-                        continue;
                     }
+                    fillDataGrid(dataTable);
                     break;
                 case 3:
                     if (beforeRadioButton.Checked || afterRadioButton.Checked)
@@ -215,12 +212,12 @@ namespace AssetMonitor
             return result;
         }
 
-        private void fillDataGrid(DataTable fetchedValues, int selectedCommandIndex)
+        private void fillDataGrid(DataTable fetchedValues)
         {
             loginstatDataGrid.DataSource = fetchedValues;
             loginstatDataGrid.Refresh();
             validateFilterBoxesEnabled();
-            localDB._sqlConnection.Close();
+            //localDB._sqlConnection.Close();
         }
 
         private void ValidateAssets()
